@@ -201,8 +201,9 @@
     <canvas id="cv" width="1920" height="1080"></canvas>
   </div>
 
-  <!-- Overlay: chỉ nút Reset -->
+  <!-- Overlay: Reset + Demo -->
   <div id="overlay">
+    <button class="btn-ctrl" id="btnAuto">▶ Demo</button>
     <button class="btn-ctrl" id="btnReset">↺ Reset</button>
   </div>
 
@@ -476,9 +477,39 @@ function pollFB() {
     .catch(() => {});
 }
 
+// ===== AUTO DEMO =====
+let isAuto = false, autoInterval = null;
+const demoMsgs = ['Chúc tốt lành!','Cây xanh là lá phổi','Trồng cây giữ tương lai','Mỗi lá là hy vọng','Thiên nhiên cho bình yên','Yêu thương cây cỏ','Một cây nên non','Xanh mãi tuổi trẻ'];
+let demoIdx = 0;
+
+$('btnAuto').addEventListener('click', () => { isAuto ? stopAutoDemo() : startAutoDemo(); });
+
+function startAutoDemo() {
+  isAuto = true;
+  $('btnAuto').textContent = '⏸ Dừng demo';
+  demoIdx = 0;
+  autoInterval = setInterval(() => {
+    if (currentPatch >= patches.length) { stopAutoDemo(); return; }
+    const name = 'Demo';
+    const text = demoMsgs[demoIdx % demoMsgs.length];
+    if (growOne()) {
+      showToast(`🌿 ${name}: "${text}"`);
+      addTicker(name, text);
+    }
+    demoIdx++;
+  }, 400);
+}
+
+function stopAutoDemo() {
+  isAuto = false;
+  $('btnAuto').textContent = '▶ Demo';
+  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
+}
+
 // ===== CONTROLS =====
 $('btnReset').addEventListener('click', () => {
   if (!img2) return;
+  stopAutoDemo();
   stopFirebase(); knownKeys.clear();
   $('tickerTrack').innerHTML = ''; $('ticker').classList.add('hidden');
   initCanvas();
