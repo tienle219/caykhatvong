@@ -55,10 +55,27 @@
   }
   .form-group input:focus, .form-group textarea:focus { border-color: #34d399; }
   .form-group input::placeholder, .form-group textarea::placeholder { color: #3a3d4a; }
-
   .form-group textarea { min-height: 100px; resize: vertical; line-height: 1.5; }
-
   .char-count { text-align: right; font-size: 0.65rem; color: #444; margin-top: 4px; }
+
+  /* ===== TYPE SELECTOR ===== */
+  .type-group { margin-bottom: 18px; }
+  .type-group > label { display: block; font-size: 0.78rem; font-weight: 600; color: #888; margin-bottom: 8px; }
+  .type-row { display: flex; gap: 10px; }
+  .type-btn {
+    flex: 1; padding: 10px 6px;
+    border: 2px solid #2a2d3a; border-radius: 12px;
+    background: #0f1117; color: #666;
+    font-family: inherit; font-weight: 600; font-size: 0.78rem;
+    cursor: pointer; transition: all 0.3s;
+    text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .type-btn .t-icon { font-size: 1.5rem; }
+  .type-btn .t-label { font-size: 0.65rem; }
+  .type-btn:hover { border-color: #555; }
+  .type-btn.sel-green { border-color: #34d399; background: rgba(52,211,153,0.1); color: #34d399; }
+  .type-btn.sel-pink  { border-color: #f9a8d4; background: rgba(249,168,212,0.1); color: #f9a8d4; }
+  .type-btn.sel-red   { border-color: #f87171; background: rgba(248,113,113,0.1); color: #f87171; }
 
   .btn-send {
     width: 100%;
@@ -84,42 +101,25 @@
     padding: 24px 0;
   }
   .success-msg .check { font-size: 3rem; margin-bottom: 12px; display: block; }
-  .success-msg h2 {
-    font-size: 1.2rem; font-weight: 700; color: #34d399; margin-bottom: 8px;
-  }
+  .success-msg h2 { font-size: 1.2rem; font-weight: 700; color: #34d399; margin-bottom: 8px; }
   .success-msg p { color: #888; font-size: 0.82rem; line-height: 1.5; }
   .btn-again {
-    margin-top: 20px;
-    padding: 10px 24px;
-    border: 2px solid #34d399;
-    border-radius: 10px;
-    background: transparent;
-    color: #34d399;
-    font-family: inherit;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
+    margin-top: 20px; padding: 10px 24px;
+    border: 2px solid #34d399; border-radius: 10px;
+    background: transparent; color: #34d399;
+    font-family: inherit; font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s;
   }
   .btn-again:hover { background: rgba(52,211,153,0.1); }
 
   .error-msg {
     display: none;
-    background: #2d1215;
-    color: #f87171;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 0.78rem;
-    margin-bottom: 14px;
-    text-align: center;
+    background: #2d1215; color: #f87171;
+    padding: 10px 14px; border-radius: 10px;
+    font-size: 0.78rem; margin-bottom: 14px; text-align: center;
   }
 
-  .footer {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 0.68rem;
-    color: #444;
-  }
+  .footer { text-align: center; margin-top: 20px; font-size: 0.68rem; color: #444; }
 </style>
 </head>
 <body>
@@ -128,7 +128,7 @@
   <div class="header">
     <span class="icon">🌳</span>
     <h1>Gửi Lời Chúc</h1>
-    <p>Mỗi lời chúc sẽ giúp cây mọc thêm lá xanh.<br>Hãy để lại thông điệp của bạn!</p>
+    <p>Mỗi lời chúc sẽ giúp cây nở thêm lá hoa.<br>Hãy để lại thông điệp của bạn!</p>
   </div>
 
   <div id="formArea">
@@ -145,13 +145,28 @@
       <div class="char-count"><span id="charCt">0</span>/200</div>
     </div>
 
+    <div class="type-group">
+      <label>Chọn loại lá</label>
+      <div class="type-row">
+        <button class="type-btn sel-green" id="tGreen" onclick="pickType('green')">
+          <span class="t-icon">🌿</span><span class="t-label">Lá xanh</span>
+        </button>
+        <button class="type-btn" id="tPink" onclick="pickType('pink')">
+          <span class="t-icon">🌸</span><span class="t-label">Lá hồng</span>
+        </button>
+        <button class="type-btn" id="tRed" onclick="pickType('red')">
+          <span class="t-icon">🌺</span><span class="t-label">Hoa đỏ</span>
+        </button>
+      </div>
+    </div>
+
     <button class="btn-send" id="btnSend">🌿 Gửi lời chúc</button>
   </div>
 
   <div class="success-msg" id="successMsg">
     <span class="check">✅</span>
     <h2>Gửi thành công!</h2>
-    <p>Lời chúc của bạn đã được gửi đi.<br>Một cụm lá mới sẽ mọc trên cây!</p>
+    <p>Lời chúc của bạn đã được gửi đi.<br>Cây sẽ nở thêm lá hoa mới!</p>
     <button class="btn-again" id="btnAgain">Gửi thêm lời chúc</button>
   </div>
 
@@ -161,38 +176,41 @@
 </div>
 
 <script>
-// Hardcode Firebase URL, fallback sang query param nếu có
 const DEFAULT_FB_URL = 'https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app';
 const params = new URLSearchParams(window.location.search);
 let firebaseUrl = params.get('fb') || DEFAULT_FB_URL;
 
+let selectedType = 'green';
+const typeIcons = { green: '🌿', pink: '🌸', red: '🌺' };
+
+function pickType(type) {
+  selectedType = type;
+  // Reset tất cả
+  document.querySelectorAll('.type-btn').forEach(b => b.className = 'type-btn');
+  // Active đúng nút
+  const map = { green: 'tGreen', pink: 'tPink', red: 'tRed' };
+  document.getElementById(map[type]).classList.add('sel-' + type);
+  // Đổi icon nút gửi
+  document.getElementById('btnSend').textContent = typeIcons[type] + ' Gửi lời chúc';
+}
+
 const nameInput = document.getElementById('nameInput');
-const msgInput = document.getElementById('msgInput');
-const charCt = document.getElementById('charCt');
-const btnSend = document.getElementById('btnSend');
-const errorMsg = document.getElementById('errorMsg');
-const formArea = document.getElementById('formArea');
+const msgInput  = document.getElementById('msgInput');
+const charCt    = document.getElementById('charCt');
+const btnSend   = document.getElementById('btnSend');
+const errorMsg  = document.getElementById('errorMsg');
+const formArea  = document.getElementById('formArea');
 const successMsg = document.getElementById('successMsg');
 
-msgInput.addEventListener('input', () => {
-  charCt.textContent = msgInput.value.length;
-});
-
+msgInput.addEventListener('input', () => { charCt.textContent = msgInput.value.length; });
 nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') msgInput.focus(); });
 
 btnSend.addEventListener('click', async () => {
   const name = nameInput.value.trim() || 'Ẩn danh';
   const text = msgInput.value.trim();
 
-  if (!text) {
-    showError('Vui lòng nhập lời chúc!');
-    return;
-  }
-
-  if (!firebaseUrl) {
-    showError('Không tìm thấy cấu hình Firebase.');
-    return;
-  }
+  if (!text) { showError('Vui lòng nhập lời chúc!'); return; }
+  if (!firebaseUrl) { showError('Không tìm thấy cấu hình Firebase.'); return; }
 
   btnSend.disabled = true;
   btnSend.textContent = 'Đang gửi...';
@@ -204,19 +222,17 @@ btnSend.addEventListener('click', async () => {
       body: JSON.stringify({
         name: name,
         text: text,
+        type: selectedType,
         timestamp: Date.now()
       })
     });
-
-    if (!res.ok) throw new Error('Gửi thất bại');
-
+    if (!res.ok) throw new Error('fail');
     formArea.style.display = 'none';
     successMsg.style.display = 'block';
-
   } catch (err) {
     showError('Gửi thất bại. Vui lòng thử lại.');
     btnSend.disabled = false;
-    btnSend.textContent = '🌿 Gửi lời chúc';
+    btnSend.textContent = typeIcons[selectedType] + ' Gửi lời chúc';
   }
 });
 
@@ -227,7 +243,8 @@ document.getElementById('btnAgain').addEventListener('click', () => {
   nameInput.value = '';
   charCt.textContent = '0';
   btnSend.disabled = false;
-  btnSend.textContent = '🌿 Gửi lời chúc';
+  selectedType = 'green';
+  pickType('green');
   errorMsg.style.display = 'none';
 });
 
