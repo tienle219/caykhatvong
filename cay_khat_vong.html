@@ -77,13 +77,11 @@
     transform-origin: center center; display: block;
   }
 
-  /* ===== OVERLAY — ẩn, hover hiện ===== */
+  /* ===== OVERLAY — chỉ Reset ===== */
   #overlay {
     position: fixed; bottom: 24px; right: 24px;
     display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 50;
-    opacity: 0; transition: opacity 0.3s;
   }
-  #overlay:hover { opacity: 1; }
   .btn-ctrl {
     font-family: inherit; font-weight: 600; font-size: 0.7rem; padding: 7px 14px;
     border: 1px solid #2a2d3a; border-radius: 8px; cursor: pointer;
@@ -91,16 +89,14 @@
   }
   .btn-ctrl:hover { background: rgba(40,43,61,0.95); color: #ccc; }
 
-  /* ===== CAROUSEL Y SLIDER — ẩn, hover hiện ===== */
+  /* ===== CAROUSEL Y SLIDER ===== */
   #carouselYWrap {
     position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
     z-index: 60; display: none;
     flex-direction: column; align-items: center; gap: 6px;
     background: rgba(21,24,33,0.9); border: 1px solid #2a2d3a; border-radius: 12px;
     padding: 14px 8px; backdrop-filter: blur(8px);
-    opacity: 0; transition: opacity 0.3s;
   }
-  #carouselYWrap:hover { opacity: 1; }
   #carouselYWrap .cy-label {
     font-size: 0.6rem; color: #34d399; font-weight: 700; writing-mode: vertical-lr;
     text-orientation: mixed; letter-spacing: 1px;
@@ -115,7 +111,9 @@
     -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
     background: #34d399; cursor: pointer; border: 2px solid #0c0e14;
   }
-  #carouselYWrap .cy-val { font-size: 0.68rem; color: #888; font-weight: 600; }
+  #carouselYWrap .cy-val {
+    font-size: 0.68rem; color: #888; font-weight: 600;
+  }
 
   /* ===== TOAST ===== */
   #toast {
@@ -127,17 +125,12 @@
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ===== LEAF BURST — bay từ thân vào patch ===== */
-  .leaf-burst {
-    position: fixed; pointer-events: none; z-index: 300;
-    opacity: 0;
-    animation: leafAppear 1s ease-out forwards;
-  }
-  @keyframes leafAppear {
-    0%   { opacity: 0.9; transform: scale(0.3); }
-    50%  { opacity: 1; transform: scale(1.1); }
-    80%  { opacity: 0.7; transform: scale(0.9); }
-    100% { opacity: 0; transform: scale(0.5); }
+  /* ===== LEAF BURST ===== */
+  .leaf-burst { position: fixed; pointer-events: none; z-index: 300; opacity: 0; animation: leafFloat 1.4s ease forwards; }
+  @keyframes leafFloat {
+    0%   { opacity: 1; transform: scale(0.5) rotate(0deg) translateY(0); }
+    60%  { opacity: 0.8; }
+    100% { opacity: 0; transform: scale(1.4) rotate(200deg) translateY(-80px); }
   }
 
   /* ===== LIGHTBOX ===== */
@@ -208,11 +201,13 @@
     <canvas id="cv" width="1920" height="1080"></canvas>
   </div>
 
+  <!-- Overlay: Reset + Demo -->
   <div id="overlay">
     <button class="btn-ctrl" id="btnAuto">▶ Demo</button>
     <button class="btn-ctrl" id="btnReset">↺ Reset</button>
   </div>
 
+  <!-- Slider dọc điều chỉnh vị trí Y carousel -->
   <div id="carouselYWrap">
     <span class="cy-label">Vị trí ảnh</span>
     <input type="range" id="slCY" min="20" max="95" value="70" step="1">
@@ -230,7 +225,9 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+// ============================================================
 const DEFAULT_FB_URL = 'https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app';
+// ============================================================
 
 const $ = id => document.getElementById(id);
 const cv = $('cv'), ctx = cv.getContext('2d');
@@ -243,9 +240,9 @@ let trunkPhotos = [], trunkAngle = 0;
 let animFrameId = null, compositeSnapshot = null;
 let firebaseUrl = '';
 let fbListener = null, knownKeys = new Set();
-// crop-fill source rect
-let cropRect = null; // { sx, sy, sw, sh }
+let imgRect = null;
 
+// Carousel Y — chỉ tham số này được điều chỉnh, còn lại giữ nguyên
 let carouselCY = 0.70;
 
 if (DEFAULT_FB_URL) $('fbUrl').value = DEFAULT_FB_URL;
@@ -257,6 +254,7 @@ function scaleCanvas() {
 }
 window.addEventListener('resize', scaleCanvas);
 
+// ===== LOAD IMAGE =====
 function loadImg(file) {
   return new Promise(res => {
     const r = new FileReader();
@@ -290,6 +288,7 @@ $('btnStart').addEventListener('click', () => {
   $('mainScreen').style.display  = 'block';
   scaleCanvas(); initCanvas();
   if (firebaseUrl) startFirebase();
+  // Hiện slider Y nếu có ảnh carousel
   if (trunkPhotos.length > 0) $('carouselYWrap').style.display = 'flex';
 });
 
@@ -300,114 +299,55 @@ $('slCY').addEventListener('input', () => {
   carouselCY = v / 100;
 });
 
-// ===== INIT CANVAS — crop-fill (cover) =====
+// ===== INIT CANVAS =====
 function initCanvas() {
   ctx.clearRect(0, 0, CW, CH);
-
-  // Cover fit: ảnh phủ kín canvas, cắt phần thừa
-  const imgAr = img2.width / img2.height;
-  const cvAr  = CW / CH;
-  let sx, sy, sw, sh;
-  if (imgAr > cvAr) {
-    // Ảnh rộng hơn → cắt 2 bên
-    sh = img2.height; sw = Math.round(sh * cvAr);
-    sx = Math.round((img2.width - sw) / 2); sy = 0;
-  } else {
-    // Ảnh cao hơn → cắt trên/dưới
-    sw = img2.width; sh = Math.round(sw / cvAr);
-    sx = 0; sy = Math.round((img2.height - sh) / 2);
-  }
-  cropRect = { sx, sy, sw, sh };
-
-  // Vẽ ảnh ít lá phủ kín
-  ctx.drawImage(img2, sx, sy, sw, sh, 0, 0, CW, CH);
-
-  // Vẽ overlay text
-  drawOverlayText();
-
-  patches = generatePatches();
+  const ar = img2.width / img2.height;
+  let dw, dh, dx, dy;
+  if (ar >= CW / CH) { dw = CW; dh = Math.round(CW / ar); dx = 0; dy = Math.round((CH - dh) / 2); }
+  else               { dh = CH; dw = Math.round(CH * ar);  dy = 0; dx = Math.round((CW - dw) / 2); }
+  imgRect = { dx, dy, dw, dh };
+  ctx.drawImage(img2, dx, dy, dw, dh);
+  patches = generatePatches(dx, dy, dw, dh);
   currentPatch = 0;
   saveSnapshot(); startRenderLoop();
 }
 
-// ===== OVERLAY TEXT + LOGO =====
-function drawOverlayText() {
-  // "ĐOÀN XÃ VĨNH TƯỜNG" — trên cùng
-  ctx.save();
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 28px "Be Vietnam Pro", sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 10;
-  ctx.fillText('ĐOÀN XÃ VĨNH TƯỜNG', CW/2, 24);
-  ctx.restore();
-
-  // "CÂY KHÁT VỌNG TUỔI TRẺ" — dưới cùng
-  ctx.save();
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 48px "Be Vietnam Pro", sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-  ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 12;
-  ctx.fillText('CÂY KHÁT VỌNG TUỔI TRẺ', CW/2, CH - 20);
-  ctx.restore();
-}
-
-// ===== PATCHES — chỉ tán lá, rải đều =====
-// Ảnh 1280x761, crop-fill vào 1920x1080
-// Tán cây: tâm ~50%X, ~38%Y, ngang ~38%, dọc ~22%
-function generatePatches() {
+// ===== PATCHES =====
+function generatePatches(dx, dy, dw, dh) {
   const pts = [];
-  const cx = CW * 0.50, cy = CH * 0.38;
-  const rx = CW * 0.36, ry = CH * 0.22;
-  const pr = CW * 0.038, step = pr * 1.05;
-
-  // Giới hạn: trên 8% (chữ ĐOÀN), dưới 62% (thân cây)
-  const yMin = CH * 0.08;
-  const yMax = CH * 0.62;
-
-  for (let py = cy - ry; py <= cy + ry; py += step) {
+  const cx = dx + dw * 0.50, cy = dy + dh * 0.30;
+  const rx = dw * 0.38,      ry = dh * 0.28;
+  const pr = dw * 0.052,     step = pr * 1.12;
+  for (let py = cy - ry; py <= cy + ry * 0.52; py += step) {
     for (let px = cx - rx; px <= cx + rx; px += step) {
       const nx = (px - cx) / rx, ny = (py - cy) / ry;
-      if (nx * nx + ny * ny > 1.0) continue;
-      const fy = py + (Math.random()-0.5)*step*0.35;
-      if (fy < yMin || fy > yMax) continue;
-      pts.push({
-        x: px + (Math.random()-0.5)*step*0.35,
-        y: fy,
-        radius: pr*(0.8+Math.random()*0.4)
-      });
+      if (nx * nx + ny * ny <= 1.0) {
+        pts.push({ x: px + (Math.random()-0.5)*step*0.4, y: py + (Math.random()-0.5)*step*0.4, radius: pr*(0.85+Math.random()*0.35) });
+      }
     }
   }
-  // Rải đều: Fisher-Yates shuffle
-  for (let i = pts.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pts[i], pts[j]] = [pts[j], pts[i]];
+  const ts = pr * 0.9;
+  for (let py = cy + ry * 0.28; py <= dy + dh * 0.76; py += ts) {
+    const tw = dw * 0.12 * (1 - (py - cy) / (dh * 0.52) * 0.3);
+    for (let px = cx - tw; px <= cx + tw; px += ts) {
+      pts.push({ x: px + (Math.random()-0.5)*ts*0.3, y: py + (Math.random()-0.5)*ts*0.3, radius: pr*(0.62+Math.random()*0.28) });
+    }
   }
+  pts.sort((a, b) =>
+    (Math.hypot(a.x-cx, a.y-cy) + Math.random()*dw*0.2) -
+    (Math.hypot(b.x-cx, b.y-cy) + Math.random()*dw*0.2)
+  );
   return pts;
 }
 
-// ===== DRAW PATCH — với tint màu theo type =====
-function drawPatchTo(tctx, index, type) {
+// ===== DRAW PATCH =====
+function drawPatchTo(tctx, index) {
   const p = patches[index]; if (!p) return;
-  const { sx, sy, sw, sh } = cropRect;
-
+  const { dx, dy, dw, dh } = imgRect;
   const off = document.createElement('canvas'); off.width = CW; off.height = CH;
   const o = off.getContext('2d');
-
-  // Vẽ ảnh gốc (cây đầy lá) crop-fill
-  o.drawImage(img1, sx, sy, sw, sh, 0, 0, CW, CH);
-
-  // Tint màu theo loại
-  o.globalCompositeOperation = 'multiply';
-  if (type === 'pink') {
-    o.fillStyle = 'rgba(255,170,200,0.6)';
-  } else if (type === 'red') {
-    o.fillStyle = 'rgba(255,50,50,0.65)';
-  } else {
-    // green — xanh đậm hơn
-    o.fillStyle = 'rgba(30,130,50,0.3)';
-  }
-  o.fillRect(0, 0, CW, CH);
-  o.globalCompositeOperation = 'source-over';
-
-  // Radial mask tại vị trí patch
+  o.drawImage(img1, dx, dy, dw, dh);
   const g = o.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
   g.addColorStop(0,   'rgba(255,255,255,1)');
   g.addColorStop(0.5, 'rgba(255,255,255,1)');
@@ -415,7 +355,6 @@ function drawPatchTo(tctx, index, type) {
   g.addColorStop(1,   'rgba(255,255,255,0)');
   o.globalCompositeOperation = 'destination-in';
   o.fillStyle = g; o.beginPath(); o.arc(p.x, p.y, p.radius, 0, Math.PI*2); o.fill();
-
   tctx.drawImage(off, 0, 0);
 }
 
@@ -424,11 +363,10 @@ function saveSnapshot() {
   s.getContext('2d').drawImage(cv, 0, 0); compositeSnapshot = s;
 }
 
-function growOne(type) {
+function growOne() {
   if (currentPatch >= patches.length) return false;
-  type = type || 'green';
-  drawPatchTo(compositeSnapshot.getContext('2d'), currentPatch, type);
-  spawnLeafBurst(patches[currentPatch], type);
+  drawPatchTo(compositeSnapshot.getContext('2d'), currentPatch);
+  spawnLeafBurst(patches[currentPatch]);
   currentPatch++; return true;
 }
 
@@ -441,12 +379,13 @@ function renderFrame() {
 }
 function startRenderLoop() { if (animFrameId) cancelAnimationFrame(animFrameId); renderFrame(); }
 
-// ===== TRUNK CAROUSEL — dùng tọa độ canvas trực tiếp =====
+// ===== TRUNK CAROUSEL — chỉ Y đọc từ slider, còn lại giữ nguyên =====
 function drawTrunkCarousel() {
-  const tcx = CW * 0.50;
-  const tcy = CH * carouselCY;
-  const orx = CW * 0.16, ory = CH * 0.02;
-  const pw = CW * 0.09, ph = pw * 0.8;
+  const { dx, dy, dw, dh } = imgRect;
+  const tcx = dx + dw * 0.50;
+  const tcy = dy + dh * carouselCY;  // ← đọc từ slider
+  const orx = dw * 0.18, ory = dh * 0.025;
+  const pw = dw * 0.10, ph = dw * 0.08;
   const n = trunkPhotos.length, as = (Math.PI*2)/n;
   const items = [];
   for (let i = 0; i < n; i++) {
@@ -479,40 +418,17 @@ function drawTrunkCarousel() {
   }
 }
 
-// ===== LEAF BURST — bay từ gốc thân đến vị trí patch =====
-function spawnLeafBurst(patch, type) {
+// ===== LEAF BURST =====
+function spawnLeafBurst(patch) {
   const rect = cv.getBoundingClientRect();
   const sx = rect.width/CW, sy = rect.height/CH;
-
-  // Gốc thân cây: ~50%X, ~68%Y
-  const baseX = rect.left + CW * 0.50 * sx;
-  const baseY = rect.top  + CH * 0.68 * sy;
-  // Đích: vị trí patch
-  const targX = rect.left + patch.x * sx;
-  const targY = rect.top  + patch.y * sy;
-
-  const emojis = type === 'pink' ? ['🌸','🏵️','💮','🌷']
-               : type === 'red'  ? ['🌺','❤️','🔴','🌹']
-               :                   ['🌿','🍃','🍀','🌱'];
-
-  emojis.forEach((em, i) => {
+  ['🌿','🍃','🍀','🌱'].forEach((em, i) => {
     const l = document.createElement('div'); l.className = 'leaf-burst'; l.textContent = em;
-    const startX = baseX + (Math.random()-0.5)*24;
-    const startY = baseY + (Math.random()-0.5)*12;
-    l.style.left = startX + 'px';
-    l.style.top  = startY + 'px';
-    l.style.fontSize = (14+Math.random()*10) + 'px';
-    l.style.animationDelay = (i*70) + 'ms';
-    // Di chuyển đến patch bằng transition
-    l.style.transition = `left 0.7s ease-out ${i*70}ms, top 0.7s ease-out ${i*70}ms`;
-    document.body.appendChild(l);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        l.style.left = (targX + (Math.random()-0.5)*16) + 'px';
-        l.style.top  = (targY + (Math.random()-0.5)*16) + 'px';
-      });
-    });
-    setTimeout(() => l.remove(), 1300);
+    l.style.left = (rect.left + patch.x*sx + (Math.random()-0.5)*44) + 'px';
+    l.style.top  = (rect.top  + patch.y*sy + (Math.random()-0.5)*20) + 'px';
+    l.style.fontSize = (13+Math.random()*12) + 'px';
+    l.style.animationDelay = (i*80) + 'ms';
+    document.body.appendChild(l); setTimeout(() => l.remove(), 1600);
   });
 }
 
@@ -522,13 +438,14 @@ function showToast(m) {
   setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-// ===== TICKER — append, không reset animation =====
+// ===== TICKER =====
 function addTicker(name, text) {
   const track = $('tickerTrack');
   const sp = document.createElement('span'); sp.className = 'tick-item';
   sp.innerHTML = `<span class="tick-name">${esc(name||'Ẩn danh')}</span>: "${esc(text)}" &nbsp;🌿`;
   track.appendChild(sp);
   $('ticker').classList.remove('hidden');
+  track.style.animation = 'none'; void track.offsetWidth; track.style.animation = '';
 }
 
 // ===== FIREBASE POLLING =====
@@ -550,11 +467,9 @@ function pollFB() {
       Object.entries(data).forEach(([key, msg]) => {
         if (knownKeys.has(key)) return;
         knownKeys.add(key);
-        const type = msg.type || 'green';
-        if (growOne(type)) {
+        if (growOne()) {
           const name = msg.name || 'Ẩn danh', text = msg.text || '';
-          const icon = type === 'pink' ? '🌸' : type === 'red' ? '🌺' : '🌿';
-          showToast(`${icon} ${name}: "${text.slice(0,42)}${text.length>42?'…':''}"`);
+          showToast(`🌿 ${name}: "${text.slice(0,42)}${text.length>42?'…':''}"`);
           addTicker(name, text);
         }
       });
@@ -562,38 +477,40 @@ function pollFB() {
     .catch(() => {});
 }
 
-// ===== AUTO DEMO — xen kẽ 3 loại =====
+// ===== AUTO DEMO =====
 let isAuto = false, autoInterval = null;
 const demoMsgs = ['Chúc tốt lành!','Cây xanh là lá phổi','Trồng cây giữ tương lai','Mỗi lá là hy vọng','Thiên nhiên cho bình yên','Yêu thương cây cỏ','Một cây nên non','Xanh mãi tuổi trẻ'];
-const demoTypes = ['green','green','pink','green','red','pink','green','red'];
 let demoIdx = 0;
 
 $('btnAuto').addEventListener('click', () => { isAuto ? stopAutoDemo() : startAutoDemo(); });
 
 function startAutoDemo() {
-  isAuto = true; $('btnAuto').textContent = '⏸ Dừng';
+  isAuto = true;
+  $('btnAuto').textContent = '⏸ Dừng demo';
   demoIdx = 0;
   autoInterval = setInterval(() => {
     if (currentPatch >= patches.length) { stopAutoDemo(); return; }
-    const type = demoTypes[demoIdx % demoTypes.length];
+    const name = 'Demo';
     const text = demoMsgs[demoIdx % demoMsgs.length];
-    const icon = type === 'pink' ? '🌸' : type === 'red' ? '🌺' : '🌿';
-    if (growOne(type)) {
-      showToast(`${icon} Demo: "${text}"`);
-      addTicker('Demo', text);
+    if (growOne()) {
+      showToast(`🌿 ${name}: "${text}"`);
+      addTicker(name, text);
     }
     demoIdx++;
-  }, 500);
+  }, 400);
 }
+
 function stopAutoDemo() {
-  isAuto = false; $('btnAuto').textContent = '▶ Demo';
+  isAuto = false;
+  $('btnAuto').textContent = '▶ Demo';
   if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
 }
 
 // ===== CONTROLS =====
 $('btnReset').addEventListener('click', () => {
   if (!img2) return;
-  stopAutoDemo(); stopFirebase(); knownKeys.clear();
+  stopAutoDemo();
+  stopFirebase(); knownKeys.clear();
   $('tickerTrack').innerHTML = ''; $('ticker').classList.add('hidden');
   initCanvas();
   if (firebaseUrl) startFirebase();
@@ -605,12 +522,13 @@ function openLightbox(s) { $('lightboxImg').src = s; $('lightbox').classList.add
 function closeLightbox() { $('lightbox').classList.remove('open'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 cv.addEventListener('click', e => {
-  if (!trunkPhotos.length) return;
+  if (!trunkPhotos.length || !imgRect) return;
   const rect = cv.getBoundingClientRect();
   const mx = (e.clientX-rect.left)/rect.width*CW, my = (e.clientY-rect.top)/rect.height*CH;
-  const tcx = CW*0.50, tcy = CH*carouselCY;
-  const orx = CW*0.16, ory = CH*0.02;
-  const pw = CW*0.09, ph = pw*0.8, n = trunkPhotos.length, as = (Math.PI*2)/n;
+  const { dx, dy, dw, dh } = imgRect;
+  const tcx = dx+dw*0.50, tcy = dy+dh*carouselCY;
+  const orx = dw*0.18, ory = dh*0.025;
+  const pw = dw*0.10, ph = dw*0.08, n = trunkPhotos.length, as = (Math.PI*2)/n;
   let clicked = null, best = -2;
   for (let i = 0; i < n; i++) {
     const a = trunkAngle+i*as, cosA = Math.cos(a), sinA = Math.sin(a), depth = sinA;
