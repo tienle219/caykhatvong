@@ -5,681 +5,433 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cây Khát Vọng Tuổi Trẻ</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; background: #0c0e14; font-family: 'Be Vietnam Pro', sans-serif; overflow: hidden; }
 
-  /* ===== SETUP SCREEN ===== */
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: #0a0a12; color: #fff;
+  }
+
+  /* ===== SETUP SCREEN — scrollable ===== */
   #setupScreen {
-    position: fixed; inset: 0;
-    background: linear-gradient(160deg, #064e3b 0%, #0c0e14 40%, #0c0e14 100%);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 20px; z-index: 100; padding: 40px; overflow-y: auto;
+    min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 40px 20px 80px;
+    background: radial-gradient(ellipse at center, #1a2a1a 0%, #0a0a12 70%);
   }
-  #setupScreen h1 {
-    font-size: 2rem; font-weight: 800;
-    background: linear-gradient(135deg, #34d399, #10b981);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  #setupScreen.hidden { display: none; }
+
+  .setup-box {
+    background: #141422; border-radius: 16px; padding: 36px 32px;
+    max-width: 540px; width: 100%; border: 1px solid #2a2a3a;
   }
-  #setupScreen > p { color: #666; font-size: 0.85rem; }
-  .setup-section {
-    background: #151821; border-radius: 16px; padding: 22px 26px;
-    width: 100%; max-width: 560px; border: 1px solid #1e2130;
+  .setup-box h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 28px; color: #4ade80; margin-bottom: 28px; text-align: center;
   }
-  .setup-section h3 { font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 14px; }
-  .upload-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-  .upload-box {
-    background: #0f1117; border: 2px dashed #2a2d3a; border-radius: 12px;
-    padding: 14px; text-align: center; cursor: pointer; transition: all 0.3s; width: 230px;
+  .fg { margin-bottom: 20px; }
+  .fg label {
+    display: block; font-size: 13px; color: #888; margin-bottom: 6px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
   }
-  .upload-box:hover { border-color: #34d399; }
-  .upload-box.loaded { border-color: #10b981; border-style: solid; }
-  .upload-box label { font-weight: 600; font-size: 0.78rem; display: block; margin-bottom: 4px; color: #bbb; pointer-events: none; }
-  .upload-box .hint { font-size: 0.68rem; color: #555; pointer-events: none; }
-  .upload-box img { max-width: 100%; max-height: 90px; border-radius: 8px; display: none; margin-top: 8px; }
-  .upload-box.loaded img { display: block; margin: 8px auto 0; }
-  input[type="file"] { display: none; }
-  .carousel-row { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
-  .carousel-row label { font-size: 0.72rem; color: #666; font-weight: 600; }
-  .btn-add-photos {
-    font-family: inherit; font-weight: 600; font-size: 0.72rem;
-    padding: 6px 14px; border: 1px dashed #34d399; border-radius: 8px;
-    background: transparent; color: #34d399; cursor: pointer; transition: all 0.2s;
+  .fg input[type="text"] {
+    width: 100%; padding: 12px 14px; border-radius: 8px;
+    border: 1px solid #333; background: #0d0d1a; color: #fff;
+    font-size: 15px; font-family: inherit;
   }
-  .btn-add-photos:hover { background: rgba(52,211,153,0.1); }
-  .carousel-count { font-size: 0.68rem; color: #555; }
-  .field-wrap { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-  .field-wrap:first-child { margin-top: 0; }
-  .field-wrap label { font-size: 0.72rem; color: #888; font-weight: 600; }
-  .field-wrap input[type="text"] {
-    width: 100%; background: #0f1117; border: 2px solid #2a2d3a; border-radius: 10px;
-    color: #e0e0e0; font-family: inherit; font-size: 0.82rem; padding: 10px 14px; outline: none;
-    transition: border-color 0.3s;
+  .fg input[type="text"]:focus { outline: none; border-color: #4ade80; }
+  .fg input[type="file"] { display: block; color: #999; font-size: 13px; margin-top: 4px; cursor: pointer; }
+  .img-preview {
+    margin-top: 8px; max-width: 280px; max-height: 160px;
+    border-radius: 8px; border: 2px solid #333; display: none;
   }
-  .field-wrap input[type="text"]:focus { border-color: #34d399; }
-  .field-wrap input[type="text"]::placeholder { color: #3a3d4a; }
   .btn-start {
-    width: 100%; max-width: 560px; padding: 16px; border: none; border-radius: 14px;
-    background: linear-gradient(135deg, #34d399, #10b981); color: #0c0e14;
-    font-family: inherit; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;
+    display: block; width: 100%; margin-top: 28px; padding: 15px;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    color: #000; font-weight: 700; font-size: 16px;
+    border: none; border-radius: 10px; cursor: pointer; font-family: inherit;
   }
-  .btn-start:hover { box-shadow: 0 8px 28px rgba(52,211,153,0.35); transform: translateY(-2px); }
-  .btn-start:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-start:hover { transform: scale(1.02); }
 
-  /* ===== MAIN SCREEN ===== */
-  #mainScreen { display: none; position: fixed; inset: 0; background: #0c0e14; }
-  #canvasWrap {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  /* ===== LED DISPLAY ===== */
+  #led {
+    display: none; position: fixed; inset: 0;
+    width: 100vw; height: 100vh; overflow: hidden;
   }
-  canvas#cv {
-    width: 1920px; height: 1080px;
-    transform-origin: center center; display: block;
-  }
+  #led.on { display: block; }
+  #led.hide-cursor { cursor: none; }
 
-  /* ===== OVERLAY ===== */
-  #overlay {
-    position: fixed; bottom: 24px; right: 24px;
-    display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 50;
-    opacity: 0; transition: opacity 0.3s;
-  }
-  #overlay:hover { opacity: 1; }
-  /* Vùng hover rộng hơn để dễ bắt chuột */
-  #overlay::before {
-    content: ''; position: absolute; bottom: -24px; right: -24px;
-    width: 200px; height: 150px;
-  }
-  .btn-ctrl {
-    font-family: inherit; font-weight: 600; font-size: 0.7rem; padding: 7px 14px;
-    border: 1px solid #2a2d3a; border-radius: 8px; cursor: pointer;
-    background: rgba(30,33,48,0.9); color: #888; transition: all 0.2s; backdrop-filter: blur(4px);
-  }
-  .btn-ctrl:hover { background: rgba(40,43,61,0.95); color: #ccc; }
+  .tree { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #tBare { z-index: 1; }
+  #tFull { z-index: 2; opacity: 0; transition: opacity 0.3s ease; }
 
-  /* ===== CAROUSEL Y SLIDER ===== */
-  #carouselYWrap {
-    position: fixed; right: 0; top: 50%; transform: translateY(-50%);
-    z-index: 60; display: none;
-    flex-direction: column; align-items: center; gap: 6px;
-    background: rgba(21,24,33,0.9); border: 1px solid #2a2d3a; border-radius: 12px;
-    padding: 30px 24px;
-    backdrop-filter: blur(8px);
-    opacity: 0; transition: opacity 0.3s;
+  #fx { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .leaf {
+    position: absolute; font-size: 26px;
+    animation: leafFly 3s ease-out forwards;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
   }
-  #carouselYWrap:hover { opacity: 1; }
-  #carouselYWrap .cy-label {
-    font-size: 0.6rem; color: #34d399; font-weight: 700; writing-mode: vertical-lr;
-    text-orientation: mixed; letter-spacing: 1px;
-  }
-  #carouselYWrap input[type="range"] {
-    writing-mode: vertical-lr; direction: rtl;
-    width: 4px; height: 180px;
-    -webkit-appearance: slider-vertical; appearance: slider-vertical;
-    background: #1e2130; outline: none;
-  }
-  #carouselYWrap input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
-    background: #34d399; cursor: pointer; border: 2px solid #0c0e14;
-  }
-  #carouselYWrap .cy-val { font-size: 0.68rem; color: #888; font-weight: 600; }
-
-  /* ===== TOAST ===== */
-  #toast {
-    position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-80px);
-    background: #10b981; color: #fff; padding: 12px 24px; border-radius: 12px;
-    font-size: 0.88rem; font-weight: 700; box-shadow: 0 6px 28px rgba(16,185,129,0.45);
-    transition: transform 0.4s ease; z-index: 200; white-space: nowrap; max-width: 90vw;
-    overflow: hidden; text-overflow: ellipsis;
-  }
-  #toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* ===== LEAF FLY — bay từ gốc lên patch ===== */
-  .leaf-fly {
-    position: fixed; pointer-events: none; z-index: 300;
-    font-size: 18px; opacity: 0;
+  @keyframes leafFly {
+    0%   { opacity: 0; transform: translate(0,0) scale(0.2) rotate(0deg); }
+    15%  { opacity: 1; }
+    50%  { opacity: 1; transform: translate(var(--mx),var(--my)) scale(1) rotate(180deg); }
+    100% { opacity: 0; transform: translate(var(--ex),var(--ey)) scale(0.5) rotate(360deg); }
   }
 
-  /* ===== LIGHTBOX ===== */
-  .lightbox {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.88);
-    display: none; align-items: center; justify-content: center;
-    z-index: 400; backdrop-filter: blur(10px); cursor: pointer;
+  .spark {
+    position: absolute; border-radius: 50%; background: #fff;
+    z-index: 4; pointer-events: none;
+    animation: sparkF 1.5s ease-out forwards;
   }
-  .lightbox.open { display: flex; }
-  .lightbox img { max-width: 90vw; max-height: 88vh; border-radius: 14px; }
-  .lightbox-close { position: absolute; top: 20px; right: 28px; font-size: 2rem; color: #fff; cursor: pointer; background: none; border: none; }
+  @keyframes sparkF {
+    0% { opacity:1; transform:scale(1); }
+    100% { opacity:0; transform:scale(0) translateY(-30px); }
+  }
 
-  /* ===== TICKER ===== */
+  #toasts {
+    position: absolute; top: 120px; right: 24px; z-index: 20;
+    display: flex; flex-direction: column; gap: 8px;
+    max-height: 55vh; overflow: hidden;
+  }
+  .toast {
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    border-left: 4px solid #4ade80; border-radius: 10px;
+    padding: 12px 18px; max-width: 340px;
+    animation: tIn 0.4s ease-out;
+  }
+  .toast-n { font-weight: 700; font-size: 14px; color: #4ade80; }
+  .toast-m { font-size: 12px; color: #ccc; margin-top: 3px; line-height: 1.4; }
+  @keyframes tIn { from { opacity:0; transform:translateX(50px); } to { opacity:1; transform:translateX(0); } }
+
   #ticker {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: transparent; border: none;
-    padding: 7px 0; overflow: hidden; z-index: 50;
-    height: 34px;
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 15; height: 52px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 60%, transparent);
+    overflow: hidden; display: flex; align-items: center;
   }
-  #ticker.hidden { display: none; }
-  #tickerTrack { display: flex; gap: 80px; white-space: nowrap; animation: scroll 35s linear infinite; }
-  #tickerTrack .tick-item { font-size: 0.76rem; color: #6ee7b7; font-weight: 600; }
-  #tickerTrack .tick-item .tick-name { color: #34d399; }
-  @keyframes scroll { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
+  #tTrack {
+    display: flex; white-space: nowrap;
+    animation: scr var(--dur,30s) linear infinite;
+  }
+  @keyframes scr { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .ti {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 36px; font-size: 15px; color: #fff; flex-shrink: 0;
+  }
+  .ti b { color: #4ade80; font-weight: 700; }
+  .ti i { color: #444; font-style: normal; }
+
+  #photos {
+    position: absolute; bottom: 64px; left: 50%; transform: translateX(-50%);
+    z-index: 10; display: flex; gap: 10px;
+  }
+  .pth {
+    width: 110px; height: 82px; object-fit: cover;
+    border-radius: 8px; border: 2px solid rgba(255,255,255,0.5);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    animation: pf 3.5s ease-in-out infinite alternate;
+  }
+  .pth:nth-child(even) { animation-delay: -1.5s; }
+  @keyframes pf { from{transform:translateY(0)} to{transform:translateY(-6px)} }
+
+  #adm {
+    position: absolute; bottom: 66px; left: 16px; z-index: 50;
+    display: flex; gap: 6px; opacity: 0.15; transition: opacity 0.3s; cursor: default;
+  }
+  #adm:hover { opacity: 1; }
+  .ab {
+    padding: 6px 14px; border-radius: 6px;
+    border: 1px solid #444; background: rgba(0,0,0,0.7);
+    color: #999; font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .ab:hover { background: rgba(255,255,255,0.1); color: #fff; }
 </style>
 </head>
 <body>
 
 <!-- SETUP -->
 <div id="setupScreen">
-  <h1>🌳 Cây Khát Vọng Tuổi Trẻ</h1>
-  <p>Cấu hình trước khi chiếu lên màn hình LED</p>
-
-  <div class="setup-section">
-    <h3>📷 Ảnh cây</h3>
-    <div class="upload-row">
-      <div class="upload-box" id="box1" onclick="document.getElementById('f1').click()">
-        <label>Ảnh gốc — cây đầy lá</label><div class="hint">Click để chọn</div>
-        <input type="file" id="f1" accept="image/*"><img id="pv1">
-      </div>
-      <div class="upload-box" id="box2" onclick="document.getElementById('f2').click()">
-        <label>Ảnh đích — cây ít lá</label><div class="hint">Click để chọn</div>
-        <input type="file" id="f2" accept="image/*"><img id="pv2">
-      </div>
-    </div>
-    <div class="carousel-row">
-      <label>Ảnh kỷ niệm quanh gốc:</label>
-      <button class="btn-add-photos" onclick="document.getElementById('fCar').click()">+ Thêm ảnh</button>
-      <input type="file" id="fCar" accept="image/*" multiple>
-      <span class="carousel-count" id="carCount">0 ảnh</span>
-    </div>
-  </div>
-
-  <div class="setup-section">
-    <h3>🔥 Firebase</h3>
-    <div class="field-wrap">
+  <div class="setup-box">
+    <h2>🌳 Cây Khát Vọng — Cài đặt</h2>
+    <div class="fg">
       <label>Firebase Realtime Database URL</label>
-      <input type="text" id="fbUrl" placeholder="https://your-project-default-rtdb.firebaseio.com">
+      <input type="text" id="iUrl" value="https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app/wishes" placeholder="https://xxx-default-rtdb.firebaseio.com/wishes">
     </div>
+    <div class="fg">
+      <label>Ảnh cây trơ cành</label>
+      <input type="file" id="iBare" accept="image/*">
+      <img id="pBare" class="img-preview">
+    </div>
+    <div class="fg">
+      <label>Ảnh cây đầy lá</label>
+      <input type="file" id="iFull" accept="image/*">
+      <img id="pFull" class="img-preview">
+    </div>
+    <div class="fg">
+      <label>Ảnh kỷ niệm (tuỳ chọn, chọn nhiều)</label>
+      <input type="file" id="iPhotos" accept="image/*" multiple>
+    </div>
+    <button class="btn-start" id="btnGo">🚀 Bắt đầu</button>
   </div>
-
-  <button class="btn-start" id="btnStart" disabled>🌿 Bắt đầu sự kiện</button>
 </div>
 
-<!-- MAIN -->
-<div id="mainScreen">
-  <div id="canvasWrap">
-    <canvas id="cv" width="1920" height="1080"></canvas>
+<!-- LED -->
+<div id="led">
+  <img id="tBare" class="tree">
+  <img id="tFull" class="tree">
+  <div id="fx"></div>
+  <div id="toasts"></div>
+  <div id="photos"></div>
+  <div id="ticker"><div id="tTrack"></div></div>
+  <div id="adm">
+    <button class="ab" onclick="demo()">🎯 Demo</button>
+    <button class="ab" id="btnAuto" onclick="toggleAuto()">▶ Auto</button>
+    <button class="ab" onclick="resetAll()">🔄 Reset</button>
   </div>
-  <div id="overlay">
-    <button class="btn-ctrl" id="btnAuto">▶ Demo</button>
-    <button class="btn-ctrl" id="btnReset">↺ Reset</button>
-  </div>
-  <div id="carouselYWrap">
-    <span class="cy-label">Vị trí ảnh</span>
-    <input type="range" id="slCY" min="20" max="95" value="70" step="1">
-    <span class="cy-val" id="valCY">70%</span>
-  </div>
-  <div id="ticker" class="hidden"><div id="tickerTrack"></div></div>
-</div>
-
-<div id="toast"></div>
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-  <img id="lightboxImg" src="">
 </div>
 
 <script>
-// ============================================================
-const DEFAULT_FB_URL = 'https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app';
-// ============================================================
+const MAX = 10;
+const EM = { green:'🌿', pink:'🌸', red:'🌺' };
+const CO = { green:'#4ade80', pink:'#f472b6', red:'#ef4444' };
+let fbUrl='', wishes=[], pUrls=[];
+const g = id => document.getElementById(id);
 
-const $ = id => document.getElementById(id);
-const cv = $('cv'), ctx = cv.getContext('2d');
-const CW = 1920, CH = 1080;
-cv.width = CW; cv.height = CH;
+// === PREVIEW (FileReader base64) ===
+let bareDataUrl = null, fullDataUrl = null;
 
-let img1 = null, img2 = null;
-let patches = [], currentPatch = 0;
-let trunkPhotos = [], trunkAngle = 0;
-let animFrameId = null, compositeSnapshot = null;
-let firebaseUrl = '';
-let fbListener = null, knownKeys = new Set();
-let imgRect = null;
-let carouselCY = 0.70;
-
-// Logo vùng copy từ img1 → img2 (góc trái trên)
-const LOGO_W_PCT = 0.18;
-const LOGO_H_PCT = 0.22;
-
-if (DEFAULT_FB_URL) $('fbUrl').value = DEFAULT_FB_URL;
-
-// ===== SCALE =====
-function scaleCanvas() {
-  const s = Math.min(window.innerWidth / CW, window.innerHeight / CH);
-  cv.style.transform = `scale(${s})`;
+function readFile(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) { callback(e.target.result); };
+  reader.readAsDataURL(file);
 }
-window.addEventListener('resize', scaleCanvas);
 
-// ===== LOAD IMAGE =====
-function loadImg(file) {
-  return new Promise(res => {
-    const r = new FileReader();
-    r.onload = e => { const i = new Image(); i.onload = () => res(i); i.src = e.target.result; };
-    r.readAsDataURL(file);
+g('iBare').addEventListener('change', function(){
+  const f = this.files[0];
+  if(f) readFile(f, function(dataUrl){
+    bareDataUrl = dataUrl;
+    g('pBare').src = dataUrl;
+    g('pBare').style.display = 'block';
   });
-}
-
-// ===== SETUP =====
-let _r1 = false, _r2 = false;
-function chkReady() { $('btnStart').disabled = !(_r1 && _r2); }
-
-$('f1').addEventListener('change', async e => {
-  if (!e.target.files[0]) return;
-  img1 = await loadImg(e.target.files[0]);
-  $('pv1').src = img1.src; $('box1').classList.add('loaded'); _r1 = true; chkReady();
 });
-$('f2').addEventListener('change', async e => {
-  if (!e.target.files[0]) return;
-  img2 = await loadImg(e.target.files[0]);
-  $('pv2').src = img2.src; $('box2').classList.add('loaded'); _r2 = true; chkReady();
-});
-$('fCar').addEventListener('change', async e => {
-  for (const f of Array.from(e.target.files)) trunkPhotos.push(await loadImg(f));
-  $('carCount').textContent = `${trunkPhotos.length} ảnh`;
-  e.target.value = '';
-});
-$('btnStart').addEventListener('click', () => {
-  firebaseUrl = $('fbUrl').value.trim().replace(/\/$/, '');
-  $('setupScreen').style.display = 'none';
-  $('mainScreen').style.display  = 'block';
-  scaleCanvas(); initCanvas();
-  if (firebaseUrl) startFirebase();
-  if (trunkPhotos.length > 0) $('carouselYWrap').style.display = 'flex';
+g('iFull').addEventListener('change', function(){
+  const f = this.files[0];
+  if(f) readFile(f, function(dataUrl){
+    fullDataUrl = dataUrl;
+    g('pFull').src = dataUrl;
+    g('pFull').style.display = 'block';
+  });
 });
 
-// ===== SLIDER Y =====
-$('slCY').addEventListener('input', () => {
-  const v = parseInt($('slCY').value);
-  $('valCY').textContent = v + '%';
-  carouselCY = v / 100;
-});
+// === START ===
+g('btnGo').addEventListener('click', function(){
+  if(!bareDataUrl || !fullDataUrl) return alert('Chọn 2 ảnh cây!');
+  fbUrl = g('iUrl').value.trim().replace(/\/+$/,'');
+  if(!fbUrl) return alert('Nhập Firebase URL!');
 
-// ===== INIT CANVAS =====
-function initCanvas() {
-  ctx.clearRect(0, 0, CW, CH);
-  const ar = img2.width / img2.height;
-  let dw, dh, dx, dy;
-  if (ar >= CW / CH) { dw = CW; dh = Math.round(CW / ar); dx = 0; dy = Math.round((CH - dh) / 2); }
-  else               { dh = CH; dw = Math.round(CH * ar);  dy = 0; dx = Math.round((CW - dw) / 2); }
-  imgRect = { dx, dy, dw, dh };
+  g('tBare').src = bareDataUrl;
+  g('tFull').src = fullDataUrl;
 
-  // 1) Vẽ ảnh ít lá làm nền
-  ctx.drawImage(img2, dx, dy, dw, dh);
-
-  // 2) Copy logo từ ảnh đầy lá (góc trái trên) — feather blend
-  const logoW = Math.round(dw * LOGO_W_PCT);
-  const logoH = Math.round(dh * LOGO_H_PCT);
-  const tmpCv = document.createElement('canvas');
-  tmpCv.width = CW; tmpCv.height = CH;
-  const tmpCtx = tmpCv.getContext('2d');
-  tmpCtx.drawImage(img1, dx, dy, dw, dh);
-  // Tạo mask feather: đậm ở góc, mờ dần ra rìa
-  const maskCv = document.createElement('canvas');
-  maskCv.width = CW; maskCv.height = CH;
-  const mctx = maskCv.getContext('2d');
-  mctx.drawImage(tmpCv, 0, 0);
-  mctx.globalCompositeOperation = 'destination-in';
-  const grd = mctx.createRadialGradient(dx, dy, 0, dx, dy, Math.max(logoW, logoH) * 1.1);
-  grd.addColorStop(0,   'rgba(255,255,255,1)');
-  grd.addColorStop(0.6, 'rgba(255,255,255,1)');
-  grd.addColorStop(0.85,'rgba(255,255,255,0.4)');
-  grd.addColorStop(1,   'rgba(255,255,255,0)');
-  mctx.fillStyle = grd;
-  mctx.fillRect(dx, dy, logoW * 1.3, logoH * 1.3);
-  ctx.drawImage(maskCv, 0, 0);
-
-  // 3) Generate patches
-  patches = generatePatches(dx, dy, dw, dh);
-  currentPatch = 0;
-  saveSnapshot(); startRenderLoop();
-}
-
-// ===== PATCHES — ~100 tin nhắn để full cây =====
-function generatePatches(dx, dy, dw, dh) {
-  const pts = [];
-
-  // --- Tán cây (ellipse) — mở rộng cover 2 gốc cuối + đỉnh đỏ ---
-  const cx = dx + dw * 0.525;
-  const cy = dy + dh * 0.40;
-  const rx = dw * 0.46;        // rộng hơn nữa, cover 2 mép gốc
-  const ry = dh * 0.28;        // cao hơn, cover đỉnh đỏ
-  const pr = dw * 0.065;       // patch to ~125px
-  const step = pr * 0.78;      // overlap 22%
-
-  for (let py = cy - ry; py <= cy + ry; py += step) {
-    for (let px = cx - rx; px <= cx + rx; px += step) {
-      const nx = (px - cx) / rx, ny = (py - cy) / ry;
-      if (nx * nx + ny * ny <= 1.0) {
-        const relX = (px - dx) / dw, relY = (py - dy) / dh;
-        if (relX < LOGO_W_PCT && relY < LOGO_H_PCT) continue;
-        pts.push({
-          x: px + (Math.random() - 0.5) * step * 0.4,
-          y: py + (Math.random() - 0.5) * step * 0.4,
-          radius: pr * (0.85 + Math.random() * 0.35)
-        });
-      }
-    }
-  }
-
-  // --- Thân cây có lá ---
-  const ts = pr * 0.70;
-  const txMin = dx + dw * 0.36, txMax = dx + dw * 0.64;
-  const tyMin = dy + dh * 0.52, tyMax = dy + dh * 0.72;
-  for (let py = tyMin; py <= tyMax; py += ts) {
-    const progress = (py - tyMin) / (tyMax - tyMin);
-    const halfW = (txMax - txMin) / 2 * (1 - progress * 0.4);
-    const midX = (txMin + txMax) / 2;
-    for (let px = midX - halfW; px <= midX + halfW; px += ts) {
-      pts.push({
-        x: px + (Math.random() - 0.5) * ts * 0.3,
-        y: py + (Math.random() - 0.5) * ts * 0.3,
-        radius: pr * (0.6 + Math.random() * 0.3)
+  // Photos
+  const pf = g('iPhotos').files;
+  let loaded = 0;
+  if(pf.length > 0) {
+    for(let i=0;i<pf.length;i++){
+      readFile(pf[i], function(du){
+        pUrls.push(du);
+        loaded++;
+        if(loaded === pf.length) buildPhotos();
       });
     }
   }
 
-  // Sort: fill từ ngoài vào trong + random nhẹ
-  pts.sort((a, b) =>
-    (Math.hypot(a.x - cx, a.y - cy) + Math.random() * dw * 0.15) -
-    (Math.hypot(b.x - cx, b.y - cy) + Math.random() * dw * 0.15)
-  );
-  return pts;
-}
+  g('setupScreen').classList.add('hidden');
+  g('led').classList.add('on');
+  document.body.style.overflow='hidden';
+  startFB();
+});
 
-// ===== DRAW PATCH =====
-function drawPatchTo(tctx, index) {
-  const p = patches[index]; if (!p) return;
-  const { dx, dy, dw, dh } = imgRect;
-  const off = document.createElement('canvas'); off.width = CW; off.height = CH;
-  const o = off.getContext('2d');
-  o.drawImage(img1, dx, dy, dw, dh);
-  const g = o.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-  g.addColorStop(0,   'rgba(255,255,255,1)');
-  g.addColorStop(0.5, 'rgba(255,255,255,1)');
-  g.addColorStop(0.75,'rgba(255,255,255,0.6)');
-  g.addColorStop(1,   'rgba(255,255,255,0)');
-  o.globalCompositeOperation = 'destination-in';
-  o.fillStyle = g; o.beginPath(); o.arc(p.x, p.y, p.radius, 0, Math.PI * 2); o.fill();
-  tctx.drawImage(off, 0, 0);
-}
-
-function saveSnapshot() {
-  const s = document.createElement('canvas'); s.width = CW; s.height = CH;
-  s.getContext('2d').drawImage(cv, 0, 0); compositeSnapshot = s;
-}
-
-function growOne() {
-  if (currentPatch >= patches.length) return false;
-  drawPatchTo(compositeSnapshot.getContext('2d'), currentPatch);
-  spawnLeafFly(patches[currentPatch]);
-  currentPatch++; return true;
-}
-
-// ===== RENDER LOOP =====
-function renderFrame() {
-  ctx.clearRect(0, 0, CW, CH);
-  if (compositeSnapshot) ctx.drawImage(compositeSnapshot, 0, 0);
-  if (trunkPhotos.length > 0) { trunkAngle += 0.008; drawTrunkCarousel(); }
-  if (imgRect) drawOverlayTexts();
-  animFrameId = requestAnimationFrame(renderFrame);
-}
-function startRenderLoop() { if (animFrameId) cancelAnimationFrame(animFrameId); renderFrame(); }
-
-// ===== OVERLAY TEXTS (vẽ mỗi frame) =====
-function drawOverlayTexts() {
-  const { dx, dy, dw, dh } = imgRect;
-
-  // "ĐOÀN XÃ VĨNH TƯỜNG" dưới logo
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.shadowColor = 'rgba(0,0,0,0.7)';
-  ctx.shadowBlur = 8;
-  ctx.shadowOffsetY = 2;
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '700 24px "Be Vietnam Pro", sans-serif';
-  const logoBottomY = dy + dh * LOGO_H_PCT + 6;
-  const logoCenterX = dx + dw * LOGO_W_PCT / 2;
-  ctx.fillText('ĐOÀN XÃ VĨNH TƯỜNG', logoCenterX, logoBottomY);
-  ctx.restore();
-
-  // "CÂY KHÁT VỌNG TUỔI TRẺ" dưới gốc cây
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0,0,0,0.8)';
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetY = 3;
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '800 48px "Be Vietnam Pro", sans-serif';
-  ctx.fillText('CÂY KHÁT VỌNG TUỔI TRẺ', CW / 2, dy + dh * 0.96);
-  ctx.restore();
-}
-
-// ===== TRUNK CAROUSEL =====
-function drawTrunkCarousel() {
-  const { dx, dy, dw, dh } = imgRect;
-  const tcx = dx + dw * 0.50;
-  const tcy = dy + dh * carouselCY;
-  const orx = dw * 0.18, ory = dh * 0.025;
-  const pw = dw * 0.10, ph = dw * 0.08;
-  const n = trunkPhotos.length, as = (Math.PI * 2) / n;
-  const items = [];
-  for (let i = 0; i < n; i++) {
-    const a = trunkAngle + i * as, cosA = Math.cos(a), sinA = Math.sin(a);
-    const depth = sinA, sc = 0.35 + (depth + 1) * 0.5 * 0.65, op = 0.2 + (depth + 1) * 0.5 * 0.8;
-    items.push({ img: trunkPhotos[i], x: tcx + cosA * orx, y: tcy + sinA * ory, w: pw * sc, h: ph * sc, depth, op, sc });
-  }
-  items.sort((a, b) => a.depth - b.depth);
-  for (const it of items) {
-    const x = it.x - it.w / 2, y = it.y - it.h / 2, r = 4 * it.sc;
-    ctx.save(); ctx.globalAlpha = it.op;
-    ctx.beginPath();
-    ctx.moveTo(x + r, y); ctx.lineTo(x + it.w - r, y); ctx.quadraticCurveTo(x + it.w, y, x + it.w, y + r);
-    ctx.lineTo(x + it.w, y + it.h - r); ctx.quadraticCurveTo(x + it.w, y + it.h, x + it.w - r, y + it.h);
-    ctx.lineTo(x + r, y + it.h); ctx.quadraticCurveTo(x, y + it.h, x, y + it.h - r);
-    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); ctx.clip();
-    ctx.drawImage(it.img, x, y, it.w, it.h); ctx.restore();
-    if (it.depth > 0.3) {
-      ctx.save(); ctx.globalAlpha = it.op * 0.6; ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2 * it.sc;
-      ctx.beginPath();
-      ctx.moveTo(x + r, y); ctx.lineTo(x + it.w - r, y); ctx.quadraticCurveTo(x + it.w, y, x + it.w, y + r);
-      ctx.lineTo(x + it.w, y + it.h - r); ctx.quadraticCurveTo(x + it.w, y + it.h, x + it.w - r, y + it.h);
-      ctx.lineTo(x + r, y + it.h); ctx.quadraticCurveTo(x, y + it.h, x, y + it.h - r);
-      ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); ctx.stroke(); ctx.restore();
-    }
-    if (it.depth > 0.5) {
-      ctx.save(); ctx.globalAlpha = 0.15 * it.sc; ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.ellipse(it.x, it.y + it.h / 2 + 4 * it.sc, it.w * 0.4, 3 * it.sc, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-    }
+// === PHOTOS ===
+function buildPhotos(){
+  const box=g('photos'), show=pUrls.slice(0,5);
+  show.forEach((u,i)=>{
+    const im=document.createElement('img');
+    im.src=u; im.className='pth'; im.style.animationDelay=(i*0.4)+'s';
+    box.appendChild(im);
+  });
+  if(pUrls.length>5){
+    let off=0;
+    setInterval(()=>{
+      off=(off+1)%pUrls.length;
+      box.querySelectorAll('.pth').forEach((t,i)=>{ t.src=pUrls[(off+i)%pUrls.length]; });
+    },4000);
   }
 }
 
-// ===== LEAF FLY — bay từ gốc cây lên vị trí patch =====
-function spawnLeafFly(patch) {
-  const rect = cv.getBoundingClientRect();
-  const sx = rect.width / CW, sy = rect.height / CH;
-  const { dx, dy, dw, dh } = imgRect;
+// === FIREBASE ===
+function startFB(){
+  fetch(fbUrl+'.json').then(r=>r.json()).then(data=>{
+    if(data && typeof data==='object'){
+      wishes = Object.values(data).filter(w=>w&&w.name);
+      const op = Math.min(wishes.length/MAX,1);
+      g('tFull').style.transition='none';
+      g('tFull').style.opacity=op;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        g('tFull').style.transition='opacity 0.3s ease';
+      }));
+      updTicker();
+    }
+  }).catch(e=>console.warn('FB fetch:',e));
 
-  // Gốc cây (50%, 72%)
-  const trunkX = rect.left + (dx + dw * 0.50) * sx;
-  const trunkY = rect.top + (dy + dh * 0.72) * sy;
-  // Đích: vị trí patch
-  const targetX = rect.left + patch.x * sx;
-  const targetY = rect.top + patch.y * sy;
-
-  const emojis = ['🌿', '🍃', '🍀', '🌱'];
-  emojis.forEach((em, i) => {
-    const leaf = document.createElement('div');
-    leaf.className = 'leaf-fly';
-    leaf.textContent = em;
-    leaf.style.fontSize = (14 + Math.random() * 10) + 'px';
-
-    // Bắt đầu từ gốc cây
-    const startX = trunkX + (Math.random() - 0.5) * 30;
-    const startY = trunkY + (Math.random() - 0.5) * 20;
-    leaf.style.left = startX + 'px';
-    leaf.style.top = startY + 'px';
-    document.body.appendChild(leaf);
-
-    const delay = i * 60;
-    const duration = 600 + Math.random() * 400;
-
-    setTimeout(() => {
-      leaf.style.opacity = '1';
-      leaf.style.transition = `all ${duration}ms cubic-bezier(0.2, 0.8, 0.3, 1)`;
-
-      const endX = targetX + (Math.random() - 0.5) * 40;
-      const endY = targetY + (Math.random() - 0.5) * 20;
-      leaf.style.left = endX + 'px';
-      leaf.style.top = endY + 'px';
-      leaf.style.transform = `scale(1.3) rotate(${120 + Math.random() * 160}deg)`;
-
-      setTimeout(() => {
-        leaf.style.opacity = '0';
-        setTimeout(() => leaf.remove(), 300);
-      }, duration * 0.7);
-    }, delay);
+  const sse = new EventSource(fbUrl+'.json');
+  let skip=false;
+  sse.addEventListener('put',e=>{
+    try{
+      const d=JSON.parse(e.data);
+      if(!d.data) return;
+      if(d.path==='/'){ if(!skip){skip=true;} return; }
+      if(d.data.name) onWish(d.data);
+    }catch(e){}
+  });
+  sse.addEventListener('patch',e=>{
+    try{
+      const d=JSON.parse(e.data);
+      if(d.data) Object.values(d.data).forEach(w=>{ if(w&&w.name) onWish(w); });
+    }catch(e){}
   });
 }
 
-// ===== TOAST =====
-function showToast(m) {
-  const t = $('toast'); t.textContent = m; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
+// === NEW WISH ===
+function onWish(w){
+  wishes.push(w);
+  g('tFull').style.opacity = Math.min(wishes.length/MAX,1);
+  spawnLeaf(w.leafType||'green');
+  spawnSparks();
+  showToast(w);
+  updTicker();
 }
 
-// ===== TICKER =====
-function addTicker(name, text) {
-  const track = $('tickerTrack');
-  const sp = document.createElement('span'); sp.className = 'tick-item';
-  // Chỉ hiện nội dung, không hiện tên
-  sp.innerHTML = `"${esc(text)}" &nbsp;🌿`;
-  track.appendChild(sp);
-  $('ticker').classList.remove('hidden');
-  // Không reset animation — để chạy liên tục
+function spawnLeaf(type){
+  const box=g('fx'), lf=document.createElement('div');
+  lf.className='leaf'; lf.textContent=EM[type]||'🌿';
+  const cx=innerWidth*0.5, cy=innerHeight*0.6;
+  lf.style.left=(cx+(Math.random()-0.5)*50)+'px';
+  lf.style.top=cy+'px';
+  const dx=(Math.random()-0.5)*500;
+  lf.style.setProperty('--mx',(dx*0.6)+'px');
+  lf.style.setProperty('--my',(-120-Math.random()*180)+'px');
+  lf.style.setProperty('--ex',dx+'px');
+  lf.style.setProperty('--ey',(-220-Math.random()*250)+'px');
+  box.appendChild(lf);
+  setTimeout(()=>lf.remove(),3200);
 }
 
-// ===== FIREBASE POLLING =====
-function startFirebase() {
-  stopFirebase(); knownKeys.clear();
-  fetch(`${firebaseUrl}/messages.json`)
-    .then(r => r.json())
-    .then(d => {
-      if (d && typeof d === 'object') {
-        // Fill lại tất cả messages cũ (sort theo timestamp)
-        const entries = Object.entries(d).sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
-        for (const [key, msg] of entries) {
-          knownKeys.add(key);
-          if (currentPatch < patches.length) {
-            // Fill trực tiếp, không animation
-            drawPatchTo(compositeSnapshot.getContext('2d'), currentPatch);
-            currentPatch++;
-            const name = msg.name || 'Ẩn danh', text = msg.text || '';
-            addTicker(name, text);
-          }
-        }
-      }
-    })
-    .catch(() => {})
-    .finally(() => { fbListener = setInterval(pollFB, 2500); });
-}
-function stopFirebase() { if (fbListener) { clearInterval(fbListener); fbListener = null; } }
-function pollFB() {
-  if (!firebaseUrl) return;
-  fetch(`${firebaseUrl}/messages.json`)
-    .then(r => r.json())
-    .then(data => {
-      if (!data || typeof data !== 'object') return;
-      Object.entries(data).forEach(([key, msg]) => {
-        if (knownKeys.has(key)) return;
-        knownKeys.add(key);
-        const name = msg.name || 'Ẩn danh', text = msg.text || '';
-        // Luôn hiện toast + ticker dù cây đã full
-        showToast(`🌿 ${name}: "${text.slice(0, 42)}${text.length > 42 ? '…' : ''}"`);
-        addTicker(name, text);
-        // Fill lá nếu còn patches
-        growOne();
-      });
-    })
-    .catch(() => {});
-}
-
-// ===== AUTO DEMO =====
-let isAuto = false, autoInterval = null;
-const demoMsgs = ['Chúc tốt lành!', 'Cây xanh là lá phổi', 'Trồng cây giữ tương lai', 'Mỗi lá là hy vọng', 'Thiên nhiên cho bình yên', 'Yêu thương cây cỏ', 'Một cây nên non', 'Xanh mãi tuổi trẻ'];
-let demoIdx = 0;
-
-$('btnAuto').addEventListener('click', () => { isAuto ? stopAutoDemo() : startAutoDemo(); });
-
-function startAutoDemo() {
-  isAuto = true;
-  $('btnAuto').textContent = '⏸ Dừng demo';
-  demoIdx = 0;
-  autoInterval = setInterval(() => {
-    const name = 'Demo';
-    const text = demoMsgs[demoIdx % demoMsgs.length];
-    showToast(`🌿 ${name}: "${text}"`);
-    addTicker(name, text);
-    if (!growOne()) { stopAutoDemo(); return; }
-    demoIdx++;
-  }, 400);
-}
-
-function stopAutoDemo() {
-  isAuto = false;
-  $('btnAuto').textContent = '▶ Demo';
-  if (autoInterval) { clearInterval(autoInterval); autoInterval = null; }
-}
-
-// ===== CONTROLS =====
-$('btnReset').addEventListener('click', () => {
-  if (!img2) return;
-  stopAutoDemo();
-  stopFirebase(); knownKeys.clear();
-  $('tickerTrack').innerHTML = ''; $('ticker').classList.add('hidden');
-  initCanvas();
-  if (firebaseUrl) startFirebase();
-  showToast('↺ Đã reset cây');
-});
-
-// ===== LIGHTBOX =====
-function openLightbox(s) { $('lightboxImg').src = s; $('lightbox').classList.add('open'); }
-function closeLightbox() { $('lightbox').classList.remove('open'); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-cv.addEventListener('click', e => {
-  if (!trunkPhotos.length || !imgRect) return;
-  const rect = cv.getBoundingClientRect();
-  const mx = (e.clientX - rect.left) / rect.width * CW, my = (e.clientY - rect.top) / rect.height * CH;
-  const { dx, dy, dw, dh } = imgRect;
-  const tcx = dx + dw * 0.50, tcy = dy + dh * carouselCY;
-  const orx = dw * 0.18, ory = dh * 0.025;
-  const pw = dw * 0.10, ph = dw * 0.08, n = trunkPhotos.length, as = (Math.PI * 2) / n;
-  let clicked = null, best = -2;
-  for (let i = 0; i < n; i++) {
-    const a = trunkAngle + i * as, cosA = Math.cos(a), sinA = Math.sin(a), depth = sinA;
-    if (depth < 0.2) continue;
-    const sc = 0.35 + (depth + 1) * 0.5 * 0.65;
-    const px = tcx + cosA * orx, py = tcy + sinA * ory, sw = pw * sc, sh = ph * sc;
-    if (mx > px - sw / 2 && mx < px + sw / 2 && my > py - sh / 2 && my < py + sh / 2 && depth > best) { clicked = trunkPhotos[i]; best = depth; }
+function spawnSparks(){
+  const box=g('fx');
+  for(let i=0;i<5;i++){
+    const s=document.createElement('div'); s.className='spark';
+    const sz=3+Math.random()*3;
+    s.style.width=s.style.height=sz+'px';
+    s.style.left=(innerWidth*0.3+Math.random()*innerWidth*0.4)+'px';
+    s.style.top=(innerHeight*0.15+Math.random()*innerHeight*0.4)+'px';
+    s.style.animationDelay=(Math.random()*0.4)+'s';
+    box.appendChild(s);
+    setTimeout(()=>s.remove(),2000);
   }
-  if (clicked) openLightbox(clicked.src);
+}
+
+function showToast(w){
+  const box=g('toasts'), t=document.createElement('div');
+  t.className='toast';
+  t.style.borderLeftColor=CO[w.leafType]||CO.green;
+  t.innerHTML=`<div class="toast-n">${EM[w.leafType]||'🌿'} ${esc(w.name)}</div><div class="toast-m">${esc(w.message)}</div>`;
+  box.prepend(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},4500);
+  while(box.children.length>5) box.lastChild.remove();
+}
+
+function updTicker(){
+  const tr=g('tTrack');
+  if(!wishes.length){ tr.innerHTML='<span class="ti">🌱 Hãy gửi lời chúc đầu tiên...</span>'; return; }
+  const last=wishes.slice(-50); let h='';
+  for(let r=0;r<2;r++) last.forEach(w=>{
+    h+=`<span class="ti"><span>${EM[w.leafType]||'🌿'}</span><b>${esc(w.name)}</b><i>—</i><span>${esc(w.message)}</span></span>`;
+  });
+  tr.innerHTML=h;
+  tr.style.setProperty('--dur',Math.max(15,last.length*2.5)+'s');
+}
+
+// === DEMO/RESET ===
+const DN=['Minh Anh','Hữu Phúc','Thanh Hà','Quốc Bảo','Thu Hương','Văn Đức','Ngọc Mai','Hoàng Long',
+  'Lan Anh','Đức Minh','Bảo Trân','Văn Hùng','Thuỳ Linh','Quang Huy','Hồng Nhung','Trường Giang'];
+const DM=[
+  'Chúc Đoàn xã ngày càng vững mạnh!','Tuổi trẻ là sức mạnh, khát vọng là hành trình!',
+  'Mãi mãi tuổi 20, nhiệt huyết cống hiến!','Chúc sự kiện thành công rực rỡ!',
+  'Vĩnh Tường ơi, tự hào quá!','Xung kích, tình nguyện, sáng tạo!',
+  'Gửi yêu thương đến tất cả mọi người!','Hãy để khát vọng dẫn lối!',
+  'Thanh niên tiên phong, đất nước vững bền!','Một cây làm chẳng nên non, ba cây chụm lại nên hòn núi cao!',
+  'Đoàn kết, đoàn kết, đại đoàn kết!','Tuổi trẻ hôm nay, tương lai ngày mai!',
+  'Sáng mãi ngọn lửa tuổi trẻ!','Chung tay xây dựng quê hương!',
+  'Nhiệt huyết không bao giờ tắt!','Vì một Vĩnh Tường phát triển!',
+];
+let di=0;
+
+// Demo 1 lần (local, không gửi Firebase)
+function demo(){
+  const ty=['green','pink','red'];
+  onWish({name:DN[di%DN.length],message:DM[di%DM.length],leafType:ty[~~(Math.random()*3)]});
+  di++;
+}
+
+// Auto demo — gửi thật lên Firebase
+let autoTimer=null;
+function toggleAuto(){
+  const btn=g('btnAuto');
+  if(autoTimer){
+    clearInterval(autoTimer);
+    autoTimer=null;
+    btn.textContent='▶ Auto';
+    return;
+  }
+  btn.textContent='⏸ Stop';
+  autoSend(); // gửi ngay 1 cái
+  autoTimer=setInterval(autoSend, 2500); // mỗi 2.5s gửi 1 cái
+}
+
+function autoSend(){
+  if(!fbUrl) return;
+  const ty=['green','pink','red'];
+  const wish={
+    name: DN[di%DN.length],
+    message: DM[di%DM.length],
+    leafType: ty[~~(Math.random()*3)],
+    timestamp: Date.now()
+  };
+  di++;
+  fetch(fbUrl+'.json',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(wish)
+  }).catch(e=>console.warn('Auto send failed:',e));
+}
+
+function resetAll(){
+  if(!confirm('Reset cây?')) return;
+  // Stop auto nếu đang chạy
+  if(autoTimer){ clearInterval(autoTimer); autoTimer=null; g('btnAuto').textContent='▶ Auto'; }
+  wishes=[]; g('tFull').style.opacity=0; g('toasts').innerHTML='';
+  updTicker();
+}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+// === AUTO-HIDE CURSOR sau 3s idle ===
+let cursorTimer=null;
+document.addEventListener('mousemove',()=>{
+  g('led').classList.remove('hide-cursor');
+  clearTimeout(cursorTimer);
+  cursorTimer=setTimeout(()=>g('led').classList.add('hide-cursor'),3000);
 });
-
-function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-
-// Placeholder
-ctx.fillStyle = '#1a1d28'; ctx.fillRect(0, 0, CW, CH);
-ctx.fillStyle = '#34d399'; ctx.font = 'bold 36px sans-serif'; ctx.textAlign = 'center';
-ctx.fillText('Cây Khát Vọng Tuổi Trẻ', CW / 2, CH / 2 - 16);
-ctx.fillStyle = '#444'; ctx.font = '22px sans-serif';
-ctx.fillText('Tải 2 ảnh cây để bắt đầu', CW / 2, CH / 2 + 24);
 </script>
 </body>
 </html>
