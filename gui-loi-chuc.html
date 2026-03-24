@@ -1,321 +1,470 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Gửi Lời Chúc 🌳</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gửi Lời Chúc 🌳</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-    min-height: 100vh;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    background: linear-gradient(160deg, #0a1628 0%, #132743 40%, #1a3a2a 100%);
-    color: #fff;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 20px 16px 40px;
-    overflow-x: hidden;
-  }
+    body {
+      min-height: 100vh;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: linear-gradient(160deg, #0a1628 0%, #132743 40%, #1a3a2a 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 40px;
+      overflow-x: hidden;
+    }
 
-  /* Floating leaves background */
-  body::before {
-    content: '🌿🌸🌺🍃🌿🌸🌺🍃🌿🌸';
-    position: fixed; top: -20px; left: 0; right: 0;
-    font-size: 24px; letter-spacing: 20px; text-align: center;
-    opacity: 0.15;
-    animation: bgLeaves 20s linear infinite;
-    pointer-events: none; z-index: 0;
-  }
-  @keyframes bgLeaves {
-    0% { transform: translateX(-100px); }
-    100% { transform: translateX(100px); }
-  }
+    /* Floating leaves background */
+    body::before {
+      content: '🌿🌸🌺🍃🌿🌸🌺🍃🌿🌸';
+      position: fixed;
+      top: -20px;
+      left: 0;
+      right: 0;
+      font-size: 24px;
+      letter-spacing: 20px;
+      text-align: center;
+      opacity: 0.15;
+      animation: bgLeaves 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  .header {
-    text-align: center; margin-bottom: 28px; position: relative; z-index: 1;
-  }
-  .header .tree-icon {
-    font-size: 56px; margin-bottom: 8px;
-    animation: treePulse 2s ease-in-out infinite;
-  }
-  @keyframes treePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-  .header h1 {
-    font-family: 'Dancing Script', cursive;
-    font-size: 32px; color: #4ade80;
-    text-shadow: 0 0 20px rgba(74,222,128,0.3);
-  }
-  .header p {
-    font-size: 14px; color: rgba(255,255,255,0.6);
-    margin-top: 6px;
-  }
+    @keyframes bgLeaves {
+      0% {
+        transform: translateX(-100px);
+      }
 
-  .form-card {
-    width: 100%; max-width: 420px;
-    background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 28px 24px;
-    position: relative; z-index: 1;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
+      100% {
+        transform: translateX(100px);
+      }
+    }
 
-  .field { margin-bottom: 20px; }
-  .field label {
-    display: block; font-size: 13px; font-weight: 600;
-    color: rgba(255,255,255,0.7); margin-bottom: 8px;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .field input, .field textarea {
-    width: 100%; padding: 14px 16px;
-    background: rgba(255,255,255,0.08);
-    border: 1.5px solid rgba(255,255,255,0.15);
-    border-radius: 12px; color: #fff;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 16px; transition: all 0.3s;
-    -webkit-appearance: none;
-  }
-  .field input:focus, .field textarea:focus {
-    outline: none;
-    border-color: #4ade80;
-    box-shadow: 0 0 0 3px rgba(74,222,128,0.15);
-    background: rgba(255,255,255,0.12);
-  }
-  .field input::placeholder, .field textarea::placeholder {
-    color: rgba(255,255,255,0.3);
-  }
-  .field textarea { resize: none; height: 100px; line-height: 1.5; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+    }
 
-  /* Leaf type selector */
-  .leaf-selector {
-    display: flex; gap: 10px; justify-content: center;
-  }
-  .leaf-option {
-    flex: 1; padding: 14px 8px; text-align: center;
-    background: rgba(255,255,255,0.06);
-    border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 14px; cursor: pointer;
-    transition: all 0.3s; user-select: none;
-  }
-  .leaf-option:active { transform: scale(0.95); }
-  .leaf-option.selected { border-color: var(--sel-color); background: var(--sel-bg); }
-  .leaf-option .leaf-emoji { font-size: 32px; display: block; margin-bottom: 4px; }
-  .leaf-option .leaf-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); }
-  .leaf-option.selected .leaf-label { color: #fff; }
+    .header .tree-icon {
+      font-size: 56px;
+      margin-bottom: 8px;
+      animation: treePulse 2s ease-in-out infinite;
+    }
 
-  .leaf-option[data-type="green"]  { --sel-color: #4ade80; --sel-bg: rgba(74,222,128,0.15); }
-  .leaf-option[data-type="pink"]   { --sel-color: #f472b6; --sel-bg: rgba(244,114,182,0.15); }
-  .leaf-option[data-type="red"]    { --sel-color: #ef4444; --sel-bg: rgba(239,68,68,0.15); }
+    @keyframes treePulse {
 
-  /* Submit button */
-  .submit-btn {
-    width: 100%; padding: 16px; margin-top: 8px;
-    background: linear-gradient(135deg, #4ade80, #22c55e);
-    color: #000; font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 17px; font-weight: 700;
-    border: none; border-radius: 14px;
-    cursor: pointer; transition: all 0.3s;
-    box-shadow: 0 4px 20px rgba(74,222,128,0.3);
-    position: relative; overflow: hidden;
-  }
-  .submit-btn:active { transform: scale(0.97); }
-  .submit-btn:disabled {
-    opacity: 0.5; pointer-events: none;
-  }
+      0%,
+      100% {
+        transform: scale(1);
+      }
 
-  /* Success state */
-  .success-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,0.8);
-    display: none; align-items: center; justify-content: center;
-    flex-direction: column; gap: 16px;
-  }
-  .success-overlay.show { display: flex; }
-  .success-emoji { font-size: 80px; animation: successBounce 0.6s ease-out; }
-  @keyframes successBounce {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-  }
-  .success-text {
-    font-family: 'Dancing Script', cursive;
-    font-size: 28px; color: #4ade80; text-align: center;
-  }
-  .success-sub { font-size: 14px; color: rgba(255,255,255,0.6); text-align: center; }
-  .success-btn {
-    margin-top: 12px; padding: 12px 32px;
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 10px; color: #fff; font-size: 15px;
-    cursor: pointer; font-family: 'Be Vietnam Pro', sans-serif;
-  }
+      50% {
+        transform: scale(1.1);
+      }
+    }
 
-  /* Firebase URL config (hidden in URL param) */
-  .config-note {
-    margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.3);
-    text-align: center; max-width: 300px;
-  }
-</style>
+    .header h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 32px;
+      color: #4ade80;
+      text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+    }
+
+    .header p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 6px;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 16px;
+      transition: all 0.3s;
+      -webkit-appearance: none;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .field textarea {
+      resize: none;
+      height: 100px;
+      line-height: 1.5;
+    }
+
+    /* Leaf type selector */
+    .leaf-selector {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .leaf-option {
+      flex: 1;
+      padding: 14px 8px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      user-select: none;
+    }
+
+    .leaf-option:active {
+      transform: scale(0.95);
+    }
+
+    .leaf-option.selected {
+      border-color: var(--sel-color);
+      background: var(--sel-bg);
+    }
+
+    .leaf-option .leaf-emoji {
+      font-size: 32px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .leaf-option .leaf-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .leaf-option.selected .leaf-label {
+      color: #fff;
+    }
+
+    .leaf-option[data-type="green"] {
+      --sel-color: #4ade80;
+      --sel-bg: rgba(74, 222, 128, 0.15);
+    }
+
+    .leaf-option[data-type="pink"] {
+      --sel-color: #f472b6;
+      --sel-bg: rgba(244, 114, 182, 0.15);
+    }
+
+    .leaf-option[data-type="red"] {
+      --sel-color: #ef4444;
+      --sel-bg: rgba(239, 68, 68, 0.15);
+    }
+
+    /* Submit button */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      margin-top: 8px;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #000;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(74, 222, 128, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:active {
+      transform: scale(0.97);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Success state */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .success-overlay.show {
+      display: flex;
+    }
+
+    .success-emoji {
+      font-size: 80px;
+      animation: successBounce 0.6s ease-out;
+    }
+
+    @keyframes successBounce {
+      0% {
+        transform: scale(0);
+      }
+
+      50% {
+        transform: scale(1.3);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .success-text {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: #4ade80;
+      text-align: center;
+    }
+
+    .success-sub {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+    }
+
+    .success-btn {
+      margin-top: 12px;
+      padding: 12px 32px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+
+    /* Firebase URL config (hidden in URL param) */
+    .config-note {
+      margin-top: 20px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+      text-align: center;
+      max-width: 300px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="header">
-  <div class="tree-icon">🌳</div>
-  <h1>Cây Khát Vọng Tuổi Trẻ</h1>
-  <p>Gửi lời chúc để cây thêm xanh tươi!</p>
-</div>
-
-<div class="form-card">
-  <div class="field">
-    <label>Tên của bạn</label>
-    <input type="text" id="nameInput" placeholder="Nguyễn Văn A" maxlength="50" autocomplete="off">
+  <div class="header">
+    <div class="tree-icon">🌳</div>
+    <h1>Cây Khát Vọng Tuổi Trẻ</h1>
+    <p>Gửi lời chúc để cây thêm xanh tươi!</p>
   </div>
 
-  <div class="field">
-    <label>Lời chúc</label>
-    <textarea id="msgInput" placeholder="Viết lời chúc của bạn tại đây..." maxlength="200"></textarea>
-    <div style="text-align:right;margin-top:4px;">
-      <span id="charCount" style="font-size:12px;color:rgba(255,255,255,0.4);">0/200</span>
+  <div class="form-card">
+    <div class="field">
+      <label>Tên của bạn</label>
+      <input type="text" id="nameInput" placeholder="Nguyễn Văn A" maxlength="50" autocomplete="off">
     </div>
-  </div>
 
-  <div class="field">
-    <label>Chọn loại lá</label>
-    <div class="leaf-selector">
-      <div class="leaf-option selected" data-type="green" onclick="selectLeaf(this)">
-        <span class="leaf-emoji">🌿</span>
-        <span class="leaf-label">Lá xanh</span>
-      </div>
-      <div class="leaf-option" data-type="pink" onclick="selectLeaf(this)">
-        <span class="leaf-emoji">🌸</span>
-        <span class="leaf-label">Hoa hồng</span>
-      </div>
-      <div class="leaf-option" data-type="red" onclick="selectLeaf(this)">
-        <span class="leaf-emoji">🌺</span>
-        <span class="leaf-label">Hoa đỏ</span>
+    <div class="field">
+      <label>Lời chúc</label>
+      <textarea id="msgInput" placeholder="Viết lời chúc của bạn tại đây..." maxlength="200"></textarea>
+      <div style="text-align:right;margin-top:4px;">
+        <span id="charCount" style="font-size:12px;color:rgba(255,255,255,0.4);">0/200</span>
       </div>
     </div>
+
+    <div class="field">
+      <label>Chọn loại lá</label>
+      <div class="leaf-selector">
+        <div class="leaf-option selected" data-type="green" onclick="selectLeaf(this)">
+          <span class="leaf-emoji">🌿</span>
+          <span class="leaf-label">Xanh tiên phong</span>
+        </div>
+        <div class="leaf-option" data-type="yellow" onclick="selectLeaf(this)">
+          <span class="leaf-emoji">🌼</span>
+          <span class="leaf-label">Vàng tri ân</span>
+        </div>
+        <div class="leaf-option" data-type="red" onclick="selectLeaf(this)">
+          <span class="leaf-emoji">🌺</span>
+          <span class="leaf-label">Đỏ niềm tin</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitWish()">
+      🌱 Gửi Lời Chúc
+    </button>
   </div>
 
-  <button class="submit-btn" id="submitBtn" onclick="submitWish()">
-    🌱 Gửi Lời Chúc
-  </button>
-</div>
+  <!-- Success overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-emoji">🎉</div>
+    <div class="success-text">Gửi thành công!</div>
+    <div class="success-sub">Lời chúc của bạn đang bay lên cây 🌳</div>
+    <button class="success-btn" onclick="closeSuccess()">Gửi thêm lời chúc</button>
+  </div>
 
-<!-- Success overlay -->
-<div class="success-overlay" id="successOverlay">
-  <div class="success-emoji">🎉</div>
-  <div class="success-text">Gửi thành công!</div>
-  <div class="success-sub">Lời chúc của bạn đang bay lên cây 🌳</div>
-  <button class="success-btn" onclick="closeSuccess()">Gửi thêm lời chúc</button>
-</div>
+  <div class="config-note" id="configNote"></div>
 
-<div class="config-note" id="configNote"></div>
+  <script>
+    // Get Firebase URL from query param: ?fb=https://xxx.firebaseio.com/wishes
+    const params = new URLSearchParams(window.location.search);
+    let FIREBASE_URL = params.get('fb') || 'https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app/wishes';
 
-<script>
-  // Get Firebase URL from query param: ?fb=https://xxx.firebaseio.com/wishes
-  const params = new URLSearchParams(window.location.search);
-  let FIREBASE_URL = params.get('fb') || 'https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app/wishes';
-
-  // If no param, show config note
-  if (!FIREBASE_URL) {
-    document.getElementById('configNote').innerHTML =
-      '⚠️ Chưa cấu hình Firebase.<br>Thêm <code>?fb=YOUR_FIREBASE_URL</code> vào URL';
-  }
-
-  let selectedLeaf = 'green';
-
-  function selectLeaf(el) {
-    document.querySelectorAll('.leaf-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedLeaf = el.dataset.type;
-  }
-
-  // Char counter
-  document.getElementById('msgInput').addEventListener('input', function() {
-    document.getElementById('charCount').textContent = this.value.length + '/200';
-  });
-
-  async function submitWish() {
-    const name = document.getElementById('nameInput').value.trim();
-    const message = document.getElementById('msgInput').value.trim();
-
-    if (!name) { shakeField('nameInput'); return; }
-    if (!message) { shakeField('msgInput'); return; }
-
+    // If no param, show config note
     if (!FIREBASE_URL) {
-      alert('Chưa cấu hình Firebase URL!\nThêm ?fb=YOUR_URL vào địa chỉ trang.');
-      return;
+      document.getElementById('configNote').innerHTML =
+        '⚠️ Chưa cấu hình Firebase.<br>Thêm <code>?fb=YOUR_FIREBASE_URL</code> vào URL';
     }
 
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ Đang gửi...';
+    let selectedLeaf = 'green';
 
-    const wish = {
-      name,
-      message,
-      leafType: selectedLeaf,
-      timestamp: Date.now()
-    };
-
-    try {
-      const res = await fetch(FIREBASE_URL + '.json', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(wish)
-      });
-
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-
-      // Show success
-      document.getElementById('successOverlay').classList.add('show');
-
-      // Reset form
-      document.getElementById('nameInput').value = '';
-      document.getElementById('msgInput').value = '';
-      document.getElementById('charCount').textContent = '0/200';
-
-    } catch (err) {
-      alert('Gửi thất bại: ' + err.message + '\nVui lòng thử lại!');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '🌱 Gửi Lời Chúc';
+    function selectLeaf(el) {
+      document.querySelectorAll('.leaf-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedLeaf = el.dataset.type;
     }
-  }
 
-  function closeSuccess() {
-    document.getElementById('successOverlay').classList.remove('show');
-  }
+    // Char counter
+    document.getElementById('msgInput').addEventListener('input', function () {
+      document.getElementById('charCount').textContent = this.value.length + '/200';
+    });
 
-  function shakeField(id) {
-    const el = document.getElementById(id);
-    el.style.borderColor = '#ef4444';
-    el.style.animation = 'shake 0.4s ease';
-    el.focus();
-    setTimeout(() => {
-      el.style.borderColor = '';
-      el.style.animation = '';
-    }, 500);
-  }
+    async function submitWish() {
+      const name = document.getElementById('nameInput').value.trim();
+      const message = document.getElementById('msgInput').value.trim();
 
-  // Shake animation
-  const style = document.createElement('style');
-  style.textContent = `@keyframes shake {
+      if (!name) { shakeField('nameInput'); return; }
+      if (!message) { shakeField('msgInput'); return; }
+
+      if (!FIREBASE_URL) {
+        alert('Chưa cấu hình Firebase URL!\nThêm ?fb=YOUR_URL vào địa chỉ trang.');
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Đang gửi...';
+
+      const wish = {
+        name,
+        message,
+        leafType: selectedLeaf,
+        timestamp: Date.now()
+      };
+
+      try {
+        const res = await fetch(FIREBASE_URL + '.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(wish)
+        });
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        // Show success
+        document.getElementById('successOverlay').classList.add('show');
+
+        // Reset form
+        document.getElementById('nameInput').value = '';
+        document.getElementById('msgInput').value = '';
+        document.getElementById('charCount').textContent = '0/200';
+
+      } catch (err) {
+        alert('Gửi thất bại: ' + err.message + '\nVui lòng thử lại!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🌱 Gửi Lời Chúc';
+      }
+    }
+
+    function closeSuccess() {
+      document.getElementById('successOverlay').classList.remove('show');
+    }
+
+    function shakeField(id) {
+      const el = document.getElementById(id);
+      el.style.borderColor = '#ef4444';
+      el.style.animation = 'shake 0.4s ease';
+      el.focus();
+      setTimeout(() => {
+        el.style.borderColor = '';
+        el.style.animation = '';
+      }, 500);
+    }
+
+    // Shake animation
+    const style = document.createElement('style');
+    style.textContent = `@keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
     75% { transform: translateX(6px); }
   }`;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
 
-  // Enter key submit
-  document.getElementById('nameInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('msgInput').focus();
-  });
-</script>
+    // Enter key submit
+    document.getElementById('nameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('msgInput').focus();
+    });
+  </script>
 </body>
+
 </html>
