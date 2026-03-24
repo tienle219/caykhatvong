@@ -1,437 +1,690 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cây Khát Vọng Tuổi Trẻ</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cây Khát Vọng Tuổi Trẻ</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    background: #0a0a12; color: #fff;
-  }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: #0a0a12;
+      color: #fff;
+    }
 
-  /* ===== SETUP SCREEN — scrollable ===== */
-  #setupScreen {
-    min-height: 100vh;
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 40px 20px 80px;
-    background: radial-gradient(ellipse at center, #1a2a1a 0%, #0a0a12 70%);
-  }
-  #setupScreen.hidden { display: none; }
+    /* ===== SETUP SCREEN — scrollable ===== */
+    #setupScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px 80px;
+      background: radial-gradient(ellipse at center, #1a2a1a 0%, #0a0a12 70%);
+    }
 
-  .setup-box {
-    background: #141422; border-radius: 16px; padding: 36px 32px;
-    max-width: 540px; width: 100%; border: 1px solid #2a2a3a;
-  }
-  .setup-box h2 {
-    font-family: 'Dancing Script', cursive;
-    font-size: 28px; color: #4ade80; margin-bottom: 28px; text-align: center;
-  }
-  .fg { margin-bottom: 20px; }
-  .fg label {
-    display: block; font-size: 13px; color: #888; margin-bottom: 6px;
-    font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
-  }
-  .fg input[type="text"] {
-    width: 100%; padding: 12px 14px; border-radius: 8px;
-    border: 1px solid #333; background: #0d0d1a; color: #fff;
-    font-size: 15px; font-family: inherit;
-  }
-  .fg input[type="text"]:focus { outline: none; border-color: #4ade80; }
-  .fg input[type="file"] { display: block; color: #999; font-size: 13px; margin-top: 4px; cursor: pointer; }
-  .img-preview {
-    margin-top: 8px; max-width: 280px; max-height: 160px;
-    border-radius: 8px; border: 2px solid #333; display: none;
-  }
-  .btn-start {
-    display: block; width: 100%; margin-top: 28px; padding: 15px;
-    background: linear-gradient(135deg, #4ade80, #16a34a);
-    color: #000; font-weight: 700; font-size: 16px;
-    border: none; border-radius: 10px; cursor: pointer; font-family: inherit;
-  }
-  .btn-start:hover { transform: scale(1.02); }
+    #setupScreen.hidden {
+      display: none;
+    }
 
-  /* ===== LED DISPLAY ===== */
-  #led {
-    display: none; position: fixed; inset: 0;
-    width: 100vw; height: 100vh; overflow: hidden;
-  }
-  #led.on { display: block; }
-  #led.hide-cursor { cursor: none; }
+    .setup-box {
+      background: #141422;
+      border-radius: 16px;
+      padding: 36px 32px;
+      max-width: 540px;
+      width: 100%;
+      border: 1px solid #2a2a3a;
+    }
 
-  .tree { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  #tBare { z-index: 1; }
-  #tFull { z-index: 2; opacity: 0; transition: opacity 0.3s ease; }
+    .setup-box h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: #4ade80;
+      margin-bottom: 28px;
+      text-align: center;
+    }
 
-  #fx { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
-  .leaf {
-    position: absolute; font-size: 26px;
-    animation: leafFly 3s ease-out forwards;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-  }
-  @keyframes leafFly {
-    0%   { opacity: 0; transform: translate(0,0) scale(0.2) rotate(0deg); }
-    15%  { opacity: 1; }
-    50%  { opacity: 1; transform: translate(var(--mx),var(--my)) scale(1) rotate(180deg); }
-    100% { opacity: 0; transform: translate(var(--ex),var(--ey)) scale(0.5) rotate(360deg); }
-  }
+    .fg {
+      margin-bottom: 20px;
+    }
 
-  .spark {
-    position: absolute; border-radius: 50%; background: #fff;
-    z-index: 4; pointer-events: none;
-    animation: sparkF 1.5s ease-out forwards;
-  }
-  @keyframes sparkF {
-    0% { opacity:1; transform:scale(1); }
-    100% { opacity:0; transform:scale(0) translateY(-30px); }
-  }
+    .fg label {
+      display: block;
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
 
-  #toasts {
-    position: absolute; top: 120px; right: 24px; z-index: 20;
-    display: flex; flex-direction: column; gap: 8px;
-    max-height: 55vh; overflow: hidden;
-  }
-  .toast {
-    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-    border-left: 4px solid #4ade80; border-radius: 10px;
-    padding: 12px 18px; max-width: 340px;
-    animation: tIn 0.4s ease-out;
-  }
-  .toast-n { font-weight: 700; font-size: 14px; color: #4ade80; }
-  .toast-m { font-size: 12px; color: #ccc; margin-top: 3px; line-height: 1.4; }
-  @keyframes tIn { from { opacity:0; transform:translateX(50px); } to { opacity:1; transform:translateX(0); } }
+    .fg input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #0d0d1a;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+    }
 
-  #ticker {
-    position: absolute; bottom: 0; left: 0; right: 0; z-index: 15; height: 52px;
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 60%, transparent);
-    overflow: hidden; display: flex; align-items: center;
-  }
-  #tTrack {
-    display: flex; white-space: nowrap;
-    animation: scr var(--dur,30s) linear infinite;
-  }
-  @keyframes scr { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-  .ti {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 0 36px; font-size: 15px; color: #fff; flex-shrink: 0;
-  }
-  .ti b { color: #4ade80; font-weight: 700; }
-  .ti i { color: #444; font-style: normal; }
+    .fg input[type="text"]:focus {
+      outline: none;
+      border-color: #4ade80;
+    }
 
-  #photos {
-    position: absolute; bottom: 64px; left: 50%; transform: translateX(-50%);
-    z-index: 10; display: flex; gap: 10px;
-  }
-  .pth {
-    width: 110px; height: 82px; object-fit: cover;
-    border-radius: 8px; border: 2px solid rgba(255,255,255,0.5);
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-    animation: pf 3.5s ease-in-out infinite alternate;
-  }
-  .pth:nth-child(even) { animation-delay: -1.5s; }
-  @keyframes pf { from{transform:translateY(0)} to{transform:translateY(-6px)} }
+    .fg input[type="file"] {
+      display: block;
+      color: #999;
+      font-size: 13px;
+      margin-top: 4px;
+      cursor: pointer;
+    }
 
-  #adm {
-    position: absolute; bottom: 66px; left: 16px; z-index: 50;
-    display: flex; gap: 6px; opacity: 0.15; transition: opacity 0.3s; cursor: default;
-  }
-  #adm:hover { opacity: 1; }
-  .ab {
-    padding: 6px 14px; border-radius: 6px;
-    border: 1px solid #444; background: rgba(0,0,0,0.7);
-    color: #999; font-size: 12px; cursor: pointer; font-family: inherit;
-  }
-  .ab:hover { background: rgba(255,255,255,0.1); color: #fff; }
-</style>
+    .img-preview {
+      margin-top: 8px;
+      max-width: 280px;
+      max-height: 160px;
+      border-radius: 8px;
+      border: 2px solid #333;
+      display: none;
+    }
+
+    .btn-start {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      padding: 15px;
+      background: linear-gradient(135deg, #4ade80, #16a34a);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-start:hover {
+      transform: scale(1.02);
+    }
+
+    /* ===== LED DISPLAY ===== */
+    #led {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #led.on {
+      display: block;
+    }
+
+    #led.hide-cursor {
+      cursor: none;
+    }
+
+    .tree {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #tBare {
+      z-index: 1;
+    }
+
+    #tFull {
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #fx {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .leaf {
+      position: absolute;
+      font-size: 26px;
+      animation: leafFly 3s ease-out forwards;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    @keyframes leafFly {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.2) rotate(0deg);
+      }
+
+      15% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 1;
+        transform: translate(var(--mx), var(--my)) scale(1) rotate(180deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(var(--ex), var(--ey)) scale(0.5) rotate(360deg);
+      }
+    }
+
+    .spark {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      z-index: 4;
+      pointer-events: none;
+      animation: sparkF 1.5s ease-out forwards;
+    }
+
+    @keyframes sparkF {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(0) translateY(-30px);
+      }
+    }
+
+    #toasts {
+      position: absolute;
+      top: 120px;
+      right: 24px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 55vh;
+      overflow: hidden;
+    }
+
+    .toast {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      border-left: 4px solid #4ade80;
+      border-radius: 10px;
+      padding: 12px 18px;
+      max-width: 340px;
+      animation: tIn 0.4s ease-out;
+    }
+
+    .toast-n {
+      font-weight: 700;
+      font-size: 14px;
+      color: #4ade80;
+    }
+
+    .toast-m {
+      font-size: 12px;
+      color: #ccc;
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    @keyframes tIn {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    #ticker {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 15;
+      height: 52px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 60%, transparent);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    #tTrack {
+      display: flex;
+      white-space: nowrap;
+      will-change: transform;
+    }
+
+    .ti {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 36px;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .ti b {
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    .ti i {
+      color: #444;
+      font-style: normal;
+    }
+
+    #photos {
+      position: absolute;
+      bottom: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+    }
+
+    .pth {
+      width: 110px;
+      height: 82px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+      animation: pf 3.5s ease-in-out infinite alternate;
+    }
+
+    .pth:nth-child(even) {
+      animation-delay: -1.5s;
+    }
+
+    @keyframes pf {
+      from {
+        transform: translateY(0)
+      }
+
+      to {
+        transform: translateY(-6px)
+      }
+    }
+
+    #adm {
+      position: absolute;
+      bottom: 66px;
+      left: 16px;
+      z-index: 50;
+      display: flex;
+      gap: 6px;
+      opacity: 0.15;
+      transition: opacity 0.3s;
+      cursor: default;
+    }
+
+    #adm:hover {
+      opacity: 1;
+    }
+
+    .ab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: rgba(0, 0, 0, 0.7);
+      color: #999;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .ab:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- SETUP -->
-<div id="setupScreen">
-  <div class="setup-box">
-    <h2>🌳 Cây Khát Vọng — Cài đặt</h2>
-    <div class="fg">
-      <label>Firebase Realtime Database URL</label>
-      <input type="text" id="iUrl" value="https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app/wishes" placeholder="https://xxx-default-rtdb.firebaseio.com/wishes">
+  <!-- SETUP -->
+  <div id="setupScreen">
+    <div class="setup-box">
+      <h2>🌳 Cây Khát Vọng — Cài đặt</h2>
+      <div class="fg">
+        <label>Firebase Realtime Database URL</label>
+        <input type="text" id="iUrl"
+          value="https://caykhatvong-c27cc-default-rtdb.asia-southeast1.firebasedatabase.app/wishes"
+          placeholder="https://xxx-default-rtdb.firebaseio.com/wishes">
+      </div>
+      <div class="fg">
+        <label>Ảnh cây trơ cành</label>
+        <input type="file" id="iBare" accept="image/*">
+        <img id="pBare" class="img-preview">
+      </div>
+      <div class="fg">
+        <label>Ảnh cây đầy lá</label>
+        <input type="file" id="iFull" accept="image/*">
+        <img id="pFull" class="img-preview">
+      </div>
+      <div class="fg">
+        <label>Ảnh kỷ niệm (tuỳ chọn, chọn nhiều)</label>
+        <input type="file" id="iPhotos" accept="image/*" multiple>
+      </div>
+      <button class="btn-start" id="btnGo">🚀 Bắt đầu</button>
     </div>
-    <div class="fg">
-      <label>Ảnh cây trơ cành</label>
-      <input type="file" id="iBare" accept="image/*">
-      <img id="pBare" class="img-preview">
-    </div>
-    <div class="fg">
-      <label>Ảnh cây đầy lá</label>
-      <input type="file" id="iFull" accept="image/*">
-      <img id="pFull" class="img-preview">
-    </div>
-    <div class="fg">
-      <label>Ảnh kỷ niệm (tuỳ chọn, chọn nhiều)</label>
-      <input type="file" id="iPhotos" accept="image/*" multiple>
-    </div>
-    <button class="btn-start" id="btnGo">🚀 Bắt đầu</button>
   </div>
-</div>
 
-<!-- LED -->
-<div id="led">
-  <img id="tBare" class="tree">
-  <img id="tFull" class="tree">
-  <div id="fx"></div>
-  <div id="toasts"></div>
-  <div id="photos"></div>
-  <div id="ticker"><div id="tTrack"></div></div>
-  <div id="adm">
-    <button class="ab" onclick="demo()">🎯 Demo</button>
-    <button class="ab" id="btnAuto" onclick="toggleAuto()">▶ Auto</button>
-    <button class="ab" onclick="resetAll()">🔄 Reset</button>
+  <!-- LED -->
+  <div id="led">
+    <img id="tBare" class="tree">
+    <img id="tFull" class="tree">
+    <div id="fx"></div>
+    <div id="toasts"></div>
+    <div id="photos"></div>
+    <div id="ticker">
+      <div id="tTrack"></div>
+    </div>
+    <div id="adm">
+      <button class="ab" id="btnDemo" onclick="demo()">🎯 Demo</button>
+      <button class="ab" id="btnReset" onclick="resetAll()">🔄 Reset</button>
+    </div>
   </div>
-</div>
 
-<script>
-const MAX = 10;
-const EM = { green:'🌿', pink:'🌸', red:'🌺' };
-const CO = { green:'#4ade80', pink:'#f472b6', red:'#ef4444' };
-let fbUrl='', wishes=[], pUrls=[];
-const g = id => document.getElementById(id);
+  <script>
+    const MAX = 20;
+    const EM = { green: '🌿', pink: '🌸', red: '🌺' };
+    const CO = { green: '#4ade80', pink: '#f472b6', red: '#ef4444' };
+    let fbUrl = '', wishes = [], pUrls = [];
+    const g = id => document.getElementById(id);
 
-// === PREVIEW (FileReader base64) ===
-let bareDataUrl = null, fullDataUrl = null;
+    // === PREVIEW (FileReader base64) ===
+    let bareDataUrl = null, fullDataUrl = null;
 
-function readFile(file, callback) {
-  const reader = new FileReader();
-  reader.onload = function(e) { callback(e.target.result); };
-  reader.readAsDataURL(file);
-}
+    function readFile(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function (e) { callback(e.target.result); };
+      reader.readAsDataURL(file);
+    }
 
-g('iBare').addEventListener('change', function(){
-  const f = this.files[0];
-  if(f) readFile(f, function(dataUrl){
-    bareDataUrl = dataUrl;
-    g('pBare').src = dataUrl;
-    g('pBare').style.display = 'block';
-  });
-});
-g('iFull').addEventListener('change', function(){
-  const f = this.files[0];
-  if(f) readFile(f, function(dataUrl){
-    fullDataUrl = dataUrl;
-    g('pFull').src = dataUrl;
-    g('pFull').style.display = 'block';
-  });
-});
+    g('iBare').addEventListener('change', function () {
+      const f = this.files[0];
+      if (f) readFile(f, function (dataUrl) {
+        bareDataUrl = dataUrl;
+        g('pBare').src = dataUrl;
+        g('pBare').style.display = 'block';
+      });
+    });
+    g('iFull').addEventListener('change', function () {
+      const f = this.files[0];
+      if (f) readFile(f, function (dataUrl) {
+        fullDataUrl = dataUrl;
+        g('pFull').src = dataUrl;
+        g('pFull').style.display = 'block';
+      });
+    });
 
-// === START ===
-g('btnGo').addEventListener('click', function(){
-  if(!bareDataUrl || !fullDataUrl) return alert('Chọn 2 ảnh cây!');
-  fbUrl = g('iUrl').value.trim().replace(/\/+$/,'');
-  if(!fbUrl) return alert('Nhập Firebase URL!');
+    // === START ===
+    g('btnGo').addEventListener('click', function () {
+      if (!bareDataUrl || !fullDataUrl) return alert('Chọn 2 ảnh cây!');
+      fbUrl = g('iUrl').value.trim().replace(/\/+$/, '');
+      if (!fbUrl) return alert('Nhập Firebase URL!');
 
-  g('tBare').src = bareDataUrl;
-  g('tFull').src = fullDataUrl;
+      g('tBare').src = bareDataUrl;
+      g('tFull').src = fullDataUrl;
 
-  // Photos
-  const pf = g('iPhotos').files;
-  let loaded = 0;
-  if(pf.length > 0) {
-    for(let i=0;i<pf.length;i++){
-      readFile(pf[i], function(du){
-        pUrls.push(du);
-        loaded++;
-        if(loaded === pf.length) buildPhotos();
+      // Photos
+      const pf = g('iPhotos').files;
+      let loaded = 0;
+      if (pf.length > 0) {
+        for (let i = 0; i < pf.length; i++) {
+          readFile(pf[i], function (du) {
+            pUrls.push(du);
+            loaded++;
+            if (loaded === pf.length) buildPhotos();
+          });
+        }
+      }
+
+      g('setupScreen').classList.add('hidden');
+      g('led').classList.add('on');
+      document.body.style.overflow = 'hidden';
+      buildTicker();
+      startTicker();
+      startFB();
+    });
+
+    // === PHOTOS ===
+    function buildPhotos() {
+      const box = g('photos'), show = pUrls.slice(0, 5);
+      show.forEach((u, i) => {
+        const im = document.createElement('img');
+        im.src = u; im.className = 'pth'; im.style.animationDelay = (i * 0.4) + 's';
+        box.appendChild(im);
+      });
+      if (pUrls.length > 5) {
+        let off = 0;
+        setInterval(() => {
+          off = (off + 1) % pUrls.length;
+          box.querySelectorAll('.pth').forEach((t, i) => { t.src = pUrls[(off + i) % pUrls.length]; });
+        }, 4000);
+      }
+    }
+
+    // === FIREBASE ===
+    function startFB() {
+      fetch(fbUrl + '.json').then(r => r.json()).then(data => {
+        if (data && typeof data === 'object') {
+          wishes = Object.values(data).filter(w => w && w.name);
+          const op = Math.min(wishes.length / MAX, 1);
+          g('tFull').style.transition = 'none';
+          g('tFull').style.opacity = op;
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            g('tFull').style.transition = 'opacity 0.3s ease';
+          }));
+          buildTicker();
+          startTicker();
+        }
+      }).catch(e => console.warn('FB fetch:', e));
+
+      const sse = new EventSource(fbUrl + '.json');
+      let skip = false;
+      sse.addEventListener('put', e => {
+        try {
+          const d = JSON.parse(e.data);
+          if (!d.data) return;
+          if (d.path === '/') { if (!skip) { skip = true; } return; }
+          if (d.data.name) onWish(d.data);
+        } catch (e) { }
+      });
+      sse.addEventListener('patch', e => {
+        try {
+          const d = JSON.parse(e.data);
+          if (d.data) Object.values(d.data).forEach(w => { if (w && w.name) onWish(w); });
+        } catch (e) { }
       });
     }
-  }
 
-  g('setupScreen').classList.add('hidden');
-  g('led').classList.add('on');
-  document.body.style.overflow='hidden';
-  startFB();
-});
-
-// === PHOTOS ===
-function buildPhotos(){
-  const box=g('photos'), show=pUrls.slice(0,5);
-  show.forEach((u,i)=>{
-    const im=document.createElement('img');
-    im.src=u; im.className='pth'; im.style.animationDelay=(i*0.4)+'s';
-    box.appendChild(im);
-  });
-  if(pUrls.length>5){
-    let off=0;
-    setInterval(()=>{
-      off=(off+1)%pUrls.length;
-      box.querySelectorAll('.pth').forEach((t,i)=>{ t.src=pUrls[(off+i)%pUrls.length]; });
-    },4000);
-  }
-}
-
-// === FIREBASE ===
-function startFB(){
-  fetch(fbUrl+'.json').then(r=>r.json()).then(data=>{
-    if(data && typeof data==='object'){
-      wishes = Object.values(data).filter(w=>w&&w.name);
-      const op = Math.min(wishes.length/MAX,1);
-      g('tFull').style.transition='none';
-      g('tFull').style.opacity=op;
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        g('tFull').style.transition='opacity 0.3s ease';
-      }));
+    // === NEW WISH ===
+    function onWish(w) {
+      wishes.push(w);
+      g('tFull').style.opacity = Math.min(wishes.length / MAX, 1);
+      spawnLeaf(w.leafType || 'green');
+      spawnSparks();
+      showToast(w);
       updTicker();
     }
-  }).catch(e=>console.warn('FB fetch:',e));
 
-  const sse = new EventSource(fbUrl+'.json');
-  let skip=false;
-  sse.addEventListener('put',e=>{
-    try{
-      const d=JSON.parse(e.data);
-      if(!d.data) return;
-      if(d.path==='/'){ if(!skip){skip=true;} return; }
-      if(d.data.name) onWish(d.data);
-    }catch(e){}
-  });
-  sse.addEventListener('patch',e=>{
-    try{
-      const d=JSON.parse(e.data);
-      if(d.data) Object.values(d.data).forEach(w=>{ if(w&&w.name) onWish(w); });
-    }catch(e){}
-  });
-}
+    function spawnLeaf(type) {
+      const box = g('fx'), lf = document.createElement('div');
+      lf.className = 'leaf'; lf.textContent = EM[type] || '🌿';
+      const cx = innerWidth * 0.5, cy = innerHeight * 0.6;
+      lf.style.left = (cx + (Math.random() - 0.5) * 50) + 'px';
+      lf.style.top = cy + 'px';
+      const dx = (Math.random() - 0.5) * 500;
+      lf.style.setProperty('--mx', (dx * 0.6) + 'px');
+      lf.style.setProperty('--my', (-120 - Math.random() * 180) + 'px');
+      lf.style.setProperty('--ex', dx + 'px');
+      lf.style.setProperty('--ey', (-220 - Math.random() * 250) + 'px');
+      box.appendChild(lf);
+      setTimeout(() => lf.remove(), 3200);
+    }
 
-// === NEW WISH ===
-function onWish(w){
-  wishes.push(w);
-  g('tFull').style.opacity = Math.min(wishes.length/MAX,1);
-  spawnLeaf(w.leafType||'green');
-  spawnSparks();
-  showToast(w);
-  updTicker();
-}
+    function spawnSparks() {
+      const box = g('fx');
+      for (let i = 0; i < 5; i++) {
+        const s = document.createElement('div'); s.className = 'spark';
+        const sz = 3 + Math.random() * 3;
+        s.style.width = s.style.height = sz + 'px';
+        s.style.left = (innerWidth * 0.3 + Math.random() * innerWidth * 0.4) + 'px';
+        s.style.top = (innerHeight * 0.15 + Math.random() * innerHeight * 0.4) + 'px';
+        s.style.animationDelay = (Math.random() * 0.4) + 's';
+        box.appendChild(s);
+        setTimeout(() => s.remove(), 2000);
+      }
+    }
 
-function spawnLeaf(type){
-  const box=g('fx'), lf=document.createElement('div');
-  lf.className='leaf'; lf.textContent=EM[type]||'🌿';
-  const cx=innerWidth*0.5, cy=innerHeight*0.6;
-  lf.style.left=(cx+(Math.random()-0.5)*50)+'px';
-  lf.style.top=cy+'px';
-  const dx=(Math.random()-0.5)*500;
-  lf.style.setProperty('--mx',(dx*0.6)+'px');
-  lf.style.setProperty('--my',(-120-Math.random()*180)+'px');
-  lf.style.setProperty('--ex',dx+'px');
-  lf.style.setProperty('--ey',(-220-Math.random()*250)+'px');
-  box.appendChild(lf);
-  setTimeout(()=>lf.remove(),3200);
-}
+    function showToast(w) {
+      const box = g('toasts'), t = document.createElement('div');
+      t.className = 'toast';
+      t.style.borderLeftColor = CO[w.leafType] || CO.green;
+      t.innerHTML = `<div class="toast-n">${EM[w.leafType] || '🌿'} ${esc(w.name)}</div><div class="toast-m">${esc(w.message)}</div>`;
+      box.prepend(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 4500);
+      while (box.children.length > 5) box.lastChild.remove();
+    }
 
-function spawnSparks(){
-  const box=g('fx');
-  for(let i=0;i<5;i++){
-    const s=document.createElement('div'); s.className='spark';
-    const sz=3+Math.random()*3;
-    s.style.width=s.style.height=sz+'px';
-    s.style.left=(innerWidth*0.3+Math.random()*innerWidth*0.4)+'px';
-    s.style.top=(innerHeight*0.15+Math.random()*innerHeight*0.4)+'px';
-    s.style.animationDelay=(Math.random()*0.4)+'s';
-    box.appendChild(s);
-    setTimeout(()=>s.remove(),2000);
-  }
-}
+    // === TICKER — chạy độc lập, không bị reset khi có tin mới ===
+    let tickerX = 0;
+    const TICKER_SPEED = 60; // px/giây — giảm số này để chậm hơn
+    let tickerRunning = false;
+    let lastTickerTime = 0;
 
-function showToast(w){
-  const box=g('toasts'), t=document.createElement('div');
-  t.className='toast';
-  t.style.borderLeftColor=CO[w.leafType]||CO.green;
-  t.innerHTML=`<div class="toast-n">${EM[w.leafType]||'🌿'} ${esc(w.name)}</div><div class="toast-m">${esc(w.message)}</div>`;
-  box.prepend(t);
-  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},4500);
-  while(box.children.length>5) box.lastChild.remove();
-}
+    function tickerLoop(timestamp) {
+      if (!lastTickerTime) lastTickerTime = timestamp;
+      const dt = (timestamp - lastTickerTime) / 1000;
+      lastTickerTime = timestamp;
 
-function updTicker(){
-  const tr=g('tTrack');
-  if(!wishes.length){ tr.innerHTML='<span class="ti">🌱 Hãy gửi lời chúc đầu tiên...</span>'; return; }
-  const last=wishes.slice(-50); let h='';
-  for(let r=0;r<2;r++) last.forEach(w=>{
-    h+=`<span class="ti"><span>${EM[w.leafType]||'🌿'}</span><b>${esc(w.name)}</b><i>—</i><span>${esc(w.message)}</span></span>`;
-  });
-  tr.innerHTML=h;
-  tr.style.setProperty('--dur',Math.max(15,last.length*2.5)+'s');
-}
+      const track = g('tTrack');
+      if (!track.firstChild) { requestAnimationFrame(tickerLoop); return; }
 
-// === DEMO/RESET ===
-const DN=['Minh Anh','Hữu Phúc','Thanh Hà','Quốc Bảo','Thu Hương','Văn Đức','Ngọc Mai','Hoàng Long',
-  'Lan Anh','Đức Minh','Bảo Trân','Văn Hùng','Thuỳ Linh','Quang Huy','Hồng Nhung','Trường Giang'];
-const DM=[
-  'Chúc Đoàn xã ngày càng vững mạnh!','Tuổi trẻ là sức mạnh, khát vọng là hành trình!',
-  'Mãi mãi tuổi 20, nhiệt huyết cống hiến!','Chúc sự kiện thành công rực rỡ!',
-  'Vĩnh Tường ơi, tự hào quá!','Xung kích, tình nguyện, sáng tạo!',
-  'Gửi yêu thương đến tất cả mọi người!','Hãy để khát vọng dẫn lối!',
-  'Thanh niên tiên phong, đất nước vững bền!','Một cây làm chẳng nên non, ba cây chụm lại nên hòn núi cao!',
-  'Đoàn kết, đoàn kết, đại đoàn kết!','Tuổi trẻ hôm nay, tương lai ngày mai!',
-  'Sáng mãi ngọn lửa tuổi trẻ!','Chung tay xây dựng quê hương!',
-  'Nhiệt huyết không bao giờ tắt!','Vì một Vĩnh Tường phát triển!',
-];
-let di=0;
+      tickerX -= TICKER_SPEED * dt;
 
-// Demo 1 lần (local, không gửi Firebase)
-function demo(){
-  const ty=['green','pink','red'];
-  onWish({name:DN[di%DN.length],message:DM[di%DM.length],leafType:ty[~~(Math.random()*3)]});
-  di++;
-}
+      // Khi nửa đầu chạy hết → reset về 0 (seamless loop)
+      const halfW = track.scrollWidth / 2;
+      if (halfW > 0 && Math.abs(tickerX) >= halfW) tickerX = 0;
 
-// Auto demo — gửi thật lên Firebase
-let autoTimer=null;
-function toggleAuto(){
-  const btn=g('btnAuto');
-  if(autoTimer){
-    clearInterval(autoTimer);
-    autoTimer=null;
-    btn.textContent='▶ Auto';
-    return;
-  }
-  btn.textContent='⏸ Stop';
-  autoSend(); // gửi ngay 1 cái
-  autoTimer=setInterval(autoSend, 2500); // mỗi 2.5s gửi 1 cái
-}
+      track.style.transform = `translateX(${tickerX}px)`;
+      requestAnimationFrame(tickerLoop);
+    }
 
-function autoSend(){
-  if(!fbUrl) return;
-  const ty=['green','pink','red'];
-  const wish={
-    name: DN[di%DN.length],
-    message: DM[di%DM.length],
-    leafType: ty[~~(Math.random()*3)],
-    timestamp: Date.now()
-  };
-  di++;
-  fetch(fbUrl+'.json',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(wish)
-  }).catch(e=>console.warn('Auto send failed:',e));
-}
+    function startTicker() {
+      if (!tickerRunning) {
+        tickerRunning = true;
+        requestAnimationFrame(tickerLoop);
+      }
+    }
 
-function resetAll(){
-  if(!confirm('Reset cây?')) return;
-  // Stop auto nếu đang chạy
-  if(autoTimer){ clearInterval(autoTimer); autoTimer=null; g('btnAuto').textContent='▶ Auto'; }
-  wishes=[]; g('tFull').style.opacity=0; g('toasts').innerHTML='';
-  updTicker();
-}
-function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+    // Chỉ build lại nội dung khi thật sự cần (init hoặc reset)
+    function buildTicker() {
+      const tr = g('tTrack');
+      if (!wishes.length) {
+        tr.innerHTML = '<span class="ti">🌱 Hãy gửi lời chúc đầu tiên...</span>';
+        return;
+      }
+      const last = wishes.slice(-50);
+      let h = '';
+      for (let r = 0; r < 2; r++) last.forEach(w => {
+        h += `<span class="ti"><span>${EM[w.leafType] || '🌿'}</span><b>${esc(w.name)}</b><i>—</i><span>${esc(w.message)}</span></span>`;
+      });
+      tr.innerHTML = h;
+    }
 
-// === AUTO-HIDE CURSOR sau 3s idle ===
-let cursorTimer=null;
-document.addEventListener('mousemove',()=>{
-  g('led').classList.remove('hide-cursor');
-  clearTimeout(cursorTimer);
-  cursorTimer=setTimeout(()=>g('led').classList.add('hide-cursor'),3000);
-});
-</script>
+    // Thêm tin mới vào ticker mà KHÔNG rebuild — chèn vào cả 2 nửa
+    function appendTicker(w) {
+      const tr = g('tTrack');
+      // Nếu ticker rỗng hoặc chỉ có placeholder → build lại
+      if (!wishes.length || tr.querySelectorAll('.ti').length < 2) {
+        buildTicker();
+        startTicker();
+        return;
+      }
+      const html = `<span class="ti"><span>${EM[w.leafType] || '🌿'}</span><b>${esc(w.name)}</b><i>—</i><span>${esc(w.message)}</span></span>`;
+      // Thêm vào cuối track (sẽ tự xuất hiện khi scroll tới)
+      tr.insertAdjacentHTML('beforeend', html);
+    }
+
+    // Thay thế updTicker — gọi từ onWish
+    function updTicker() { appendTicker(wishes[wishes.length - 1]); }
+
+    // === DEMO/RESET ===
+    const DN = ['Lê Thu Phương', 'Hoàng Thị Hoa Mai', 'Nguyễn Thị Đan', 'Lê Thu Hương', 'Nguyễn Thị Thanh', 'Trần Văn Thuyên', 'Nguyễn Quốc Tuân', 'Nguyễn Trường Giang',
+      'Nguyễn Văn Tùng', 'Đặng Duy Mạnh', 'Nguyễn Thị Hiên', 'Nguyễn Thanh Hằng'];
+    const DM = [
+      'Tuổi trẻ Vĩnh Tường: Khát vọng trong tim - Hành động trong tay!', 'Quyết tâm xây dựng quê hương Vĩnh Tường giàu đẹp.',
+      'Gieo khát vọng, gặt thành công. Thanh niên Vĩnh Tường sẵn sàng dấn thân!', 'Thanh niên Vĩnh Tường: Tiên phong chuyển đổi số - Làm chủ tương lai.',
+      'Vĩnh Tường luôn trong tim tôi!', 'Kết nối khát vọng - Lan tỏa giá trị số cùng tuổi trẻ Vĩnh Tường.',
+      'Gửi cây khát vọng - Viết tiếp tự hào quê hương Vĩnh Tường.', 'Ước mơ lớn, hành động ngay. Tuổi trẻ Vĩnh Tường tự tin vươn xa!',
+      'Sống rực rỡ, cống hiến hết mình. Khát vọng Vĩnh Tường vươn tới tầm cao.', 'Thanh niên Vĩnh Tường, nói được làm được!',
+      'Chúc Đoàn xã ngày càng lớn mạnh!', 'Chi đoàn thôn 4 quyết tâm hoàn thành xuất sắc nhiệm vụ được giao.',
+    ];
+    let di = 0;
+
+    // Demo (local, không gửi Firebase)
+    let demoTimer = null;
+    function stopDemo() {
+      if (demoTimer) { clearInterval(demoTimer); demoTimer = null; }
+      g('btnDemo').textContent = '🎯 Demo';
+    }
+    function demo() {
+      if (demoTimer) { stopDemo(); return; }
+      g('btnDemo').textContent = '⏸ Stop';
+      demoOne();
+      demoTimer = setInterval(demoOne, 3750);
+    }
+    function demoOne() {
+      const ty = ['green', 'pink', 'red'];
+      onWish({ name: DN[di % DN.length], message: DM[di % DM.length], leafType: ty[~~(Math.random() * 3)] });
+      di++;
+    }
+
+    // Auto (gửi thật lên Firebase) — đã bỏ
+
+    function resetAll() {
+      if (!confirm('Reset cây?')) return;
+      stopDemo();
+      wishes = []; tickerX = 0; g('tFull').style.opacity = 0; g('toasts').innerHTML = '';
+      buildTicker();
+    }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+    // === AUTO-HIDE CURSOR sau 3s idle ===
+    let cursorTimer = null;
+    document.addEventListener('mousemove', () => {
+      g('led').classList.remove('hide-cursor');
+      clearTimeout(cursorTimer);
+      cursorTimer = setTimeout(() => g('led').classList.add('hide-cursor'), 3000);
+    });
+  </script>
 </body>
+
 </html>
